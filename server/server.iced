@@ -3,8 +3,8 @@ http = require("http")
 express = require("express")
 path = require("path")
 neo4j = require("neo4j")
-coffeeMiddleware = require('coffee-middleware')
-#icedMiddleware = require('iced-coffee-script-middleware')
+#coffeeMiddleware = require('coffee-middleware')
+coffeeMiddleware = require('iced-coffee-middleware')
 
 app = express()
 port = process.env.PORT or 5000

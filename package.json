@@ -5,7 +5,7 @@
   "main": "server/server.coffee",
   "dependencies": {
     "express": "*",
-    "coffee-middleware": "*",
+    "iced-coffee-middleware": "*",
     "jade": "*",
     "iced-coffee-script": "*",
     "neo4j": "*"

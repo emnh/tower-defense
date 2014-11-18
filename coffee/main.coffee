@@ -308,7 +308,7 @@ class BuyArtillery2 extends BuyItem
     @sprite = sprite
     @cost = 500
     @damage = 50
-    @speed = 2.5
+    @speed = 5.0
     @range = 250
     super()
 
@@ -361,6 +361,31 @@ class Tank1Sprite extends FixedSprite
   constructor: (callback) ->
     @imgsrc = 'data/images/Vehicles/Tank1.bmp'
     super(@imgsrc, 4, callback)
+
+class Tank2Sprite extends FixedSprite
+
+  constructor: (callback) ->
+    @imgsrc = 'data/images/Vehicles/Tank2.bmp'
+    super(@imgsrc, 4, callback)
+
+class Tank5Sprite extends FixedSprite
+
+  constructor: (callback) ->
+    @imgsrc = 'data/images/Vehicles/Tank5.bmp'
+    super(@imgsrc, 4, callback)
+
+class Tank14Sprite extends FixedSprite
+
+  constructor: (callback) ->
+    @imgsrc = 'data/images/Vehicles/Tank14.bmp'
+    super(@imgsrc, 4, callback)
+
+class MotherSprite extends FixedSprite
+
+  constructor: (callback) ->
+    @imgsrc = 'data/images/Vehicles/Mother.bmp'
+    super(@imgsrc, 0, callback)
+
 
 class Creep
 
@@ -560,20 +585,38 @@ class Wave
 class Wave1 extends Wave
   constructor: () ->
     @count = 20
-    @speed = 2.5
+    @speed = 5.0
     @interval = 1500
-    @health = 50
+    @health = 200
     @prize = 20
     @spriteClass = Tank1Sprite
 
 class Wave2 extends Wave
   constructor: () ->
     @count = 15
-    @speed = 1.5
-    @interval = 1000
-    @health = 250
+    @speed = 3.5
+    @interval = 2000
+    @health = 500
     @prize = 50
-    @spriteClass = Tank1Sprite
+    @spriteClass = Tank5Sprite
+
+class Wave3 extends Wave
+  constructor: () ->
+    @count = 100
+    @speed = 7.0
+    @interval = 250
+    @health = 100
+    @prize = 20
+    @spriteClass = Tank14Sprite
+
+class Wave4 extends Wave
+  constructor: () ->
+    @count = 1
+    @speed = 1.0
+    @interval = 1000
+    @health = 5000
+    @prize = 500
+    @spriteClass = MotherSprite
 
 
 class GameState
@@ -585,8 +628,8 @@ class GameState
     @towers = []
 
   startWave: () ->
-    if not @inWave
-      @inWave = true
+    if not @inWave and not @preparing
+      @preparing = true
       @wave += 1
       if @wave == 1
         wave = new Wave1()
@@ -594,24 +637,20 @@ class GameState
       else if @wave == 2
         wave = new Wave2()
         @startWaveP(wave)
+      else if @wave == 3
+        wave = new Wave3()
+        @startWaveP(wave)
+      else if @wave == 4
+        wave = new Wave4()
+        @startWaveP(wave)
+
+      @preparing = false
+      @inWave = true
 
   startWaveP: (wave) ->
     path = [[0, @mapHeight / 2], [@mapWidth, @mapHeight / 2]]
     await
       new wave.spriteClass(defer tank)
-    d = new Date()
-    cur = d.getTime()
-    for i in [0..wave.count]
-      creep = new Creep(@, tank.clone(), wave.speed, wave.health, path, wave.prize)
-      creep.id = i
-      creep.startTime = cur + i * wave.interval
-      @creeps.push(creep)
-
-  startWave2: () ->
-    path = [[0, @mapHeight / 2], [@mapWidth, @mapHeight / 2]]
-    wave = new Wave2()
-    await
-      new Tank1Sprite(defer tank)
     d = new Date()
     cur = d.getTime()
     for i in [0..wave.count]
@@ -660,7 +699,7 @@ class GameState
           dy = (tower.pos.y - creep.pos.y + tower.height / 2)
           dist = Math.sqrt(dx * dx + dy * dy)
           if dist < tower.range
-            if not tower.lastFire? or (tower.lastFire? and cur - tower.lastFire > tower.speed)
+            if not tower.lastFire? or (tower.lastFire? and cur - tower.lastFire > tower.speed * 100)
               creep.updateHealth(creep.health - tower.damage)
               tower.lastFire = cur
           if creep.health > 0
