@@ -1,0 +1,16 @@
+.active {
+  border: 3px solid red;
+}
+
+.buymenu-item:hover {
+  border: 3px solid red;
+}
+
+.buymenu-item {
+  padding-left: 5px;
+  padding-right: 10px;
+}
+
+.money {
+  font-size: 16pt;
+}
