@@ -1,0 +1,11 @@
+{
+  "name": "tower-defense",
+  "version": "0.0.1",
+  "private": "true",
+  "main": "server/server.coffee",
+  "dependencies": {
+    "express": "*",
+    "jade": "*",
+    "coffee-script": "*"
+  }
+}
