@@ -1,3 +1,6 @@
 [submodule "static/data"]
 	path = static/data
 	url = https://github.com/emnh/tower-defense-data
+[submodule "coffee-lib"]
+	path = coffee-lib
+	url = https://github.com/emnh/coffee-lib
