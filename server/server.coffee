@@ -6,9 +6,9 @@ neo4j = require("neo4j")
 app = express()
 port = process.env.PORT or 5000
 
-app.use "/", express.static(path.join(__dirname, "static"))
-app.use "/static", express.static(path.join(__dirname, "static")) # for source map
-app.use express.bodyParser()
+app.use "/", express.static(path.join(__dirname, "../static"))
+app.use "/static", express.static(path.join(__dirname, "../static")) # for source map
+#app.use express.bodyParser()
 app.set('views', __dirname + '/views')
 app.set('view engine', 'jade')
 

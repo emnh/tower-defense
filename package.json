@@ -6,6 +6,7 @@
   "dependencies": {
     "express": "*",
     "jade": "*",
-    "coffee-script": "*"
+    "coffee-script": "*",
+    "neo4j": "*"
   }
 }
