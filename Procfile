@@ -1,1 +1,1 @@
-web: node node_modules/iced-coffee-script/bin/coffee server/server.coffee
+web: node node_modules/iced-coffee-script/bin/coffee server/server.iced
