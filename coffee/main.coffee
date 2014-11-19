@@ -565,7 +565,7 @@ class Map
         .css('position', 'absolute')
         .css('left', x * canvas.width)
         .css('top', 0)
-    canvas.remove()
+    $(canvas).remove()
 
     canvas = grassMid.canvas
     for x in [0..(mapWidth / canvas.width)-1]
@@ -576,7 +576,7 @@ class Map
           .css('position', 'absolute')
           .css('left', x * canvas.width)
           .css('top', y * canvas.height)
-    canvas.remove()
+    $(canvas).remove()
 
     callback(@)
 
@@ -622,14 +622,15 @@ class Wave4 extends Wave
 class GameState
   constructor: () ->
     @wave = 0
+    @waveCompleted = 1
     @inWave = false
     @map = null
     @creeps = []
     @towers = []
+    @lives = 30
 
   startWave: () ->
-    if not @inWave and not @preparing
-      @preparing = true
+    if not @inWave
       @wave += 1
       if @wave == 1
         wave = new Wave1()
@@ -644,7 +645,6 @@ class GameState
         wave = new Wave4()
         @startWaveP(wave)
 
-      @preparing = false
       @inWave = true
 
   startWaveP: (wave) ->
@@ -663,9 +663,12 @@ class GameState
     d = new Date()
     cur = d.getTime()
     mapdiv = @mapdiv
-    if @creeps.length == 0
+    if @creeps.length == 0 and @inWave == true
       @inWave = false
+      @waveCompleted += 1
+    aliveCreeps = []
     for creep in @creeps
+      done = false
       if not creep.active and creep.startTime <= cur and creep.health > 0
         creep.pos =
           x: creep.path[0][0]
@@ -682,11 +685,19 @@ class GameState
         ndy = dy / dist
         creep.pos.x += creep.speed * ndx
         creep.pos.y += creep.speed * ndy
+        if creep.pos.x > @mapWidth or creep.pos.y > @mapHeight
+          @loseLife(1)
+          creep.health = 0
+          done = true
+          
         mapdiv.append(creep.container)
         $(creep.container)
           .css "position", "absolute"
           .css "left", creep.pos.x
           .css "top", creep.pos.y
+      if not done
+        aliveCreeps.push(creep)
+    @creeps = aliveCreeps
 
   frameTowers: () ->
     d = new Date()
@@ -722,11 +733,12 @@ class GameState
     if seconds >= 0
       $("#gametimer").html("Next wave in " + seconds + " seconds")
     else
+      gameState.startWave()
       d = new Date(cur - gameState.waveStart)
       $("#gametimer").html("Wave timer: #{d.getMinutes()}:#{d.getSeconds()}")
-      if not gameState.inWave
-        gameState.startWave()
 
+  updateLives: () ->
+    $("#lives").html("Lives left: #{@lives}")
 
 class CoffeeMain
   constructor: () ->
@@ -777,6 +789,10 @@ class CoffeeMain
       # TODO: animate money rising up from corpse
       gameState.money += prize
       buyMenu.updateMoney(gameState.money)
+    gameState.loseLife = (lives) ->
+      gameState.lives -= lives
+      gameState.updateLives()
+    gameState.updateLives()
    
     for canvas in map.terrain
       mapdiv.append(canvas)
