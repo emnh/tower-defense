@@ -1174,8 +1174,11 @@ class GameState
     setInterval (() -> gameState.updateGameTimer()), 1000
 
   getGameTime: () ->
-    currentTime = Misc.getTime()
-    currentTime - @pausedTime - @startTime
+    if @paused
+      @pausedStart - @pausedTime - @startTime
+    else
+      currentTime = Misc.getTime()
+      currentTime - @pausedTime - @startTime
 
   waveFinished: () ->
     @wave == @nextWave and @waveReady and @creeps.length == 0
