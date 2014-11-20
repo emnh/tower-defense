@@ -11,6 +11,10 @@
   padding-right: 10px;
 }
 
+.buyItem-cursorImage {
+  opacity:  0.5;
+}
+
 .money {
   font-size: 16pt;
 }

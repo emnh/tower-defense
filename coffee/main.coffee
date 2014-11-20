@@ -22,6 +22,24 @@ class Misc
   @copy: (ar) ->
     ar.slice()
 
+  @getTime: () ->
+    new Date().getTime()
+
+  @rotate: (container, degree) ->
+    oleft = container.width() / 2
+    otop = container.height() / 2
+    rotate = "rotate(#{degree}degree)"
+    origin = "#{oleft}px #{otop}px"
+    container
+      .css "transform", rotate
+      .css "-webkit-transform", rotate
+      .css "-moz-transform", rotate
+      .css "-ms-transform", rotate
+      .css "transform-origin", origin
+      .css "-webkit-transform-origin", origin
+      .css "-moz-transform-origin", origin
+      .css "-ms-transform-origin", origin
+
 class ImageSprite
    
   @cloneCanvas = (oldCanvas) ->
@@ -86,7 +104,6 @@ class ImageSprite
     while queue.length > 0
       [x, y] = queue.pop()
       rgb = @getPixel(pixels, x, y)
-      #console.log(x, y, rgb, @isTransparent(rgb))
       if not @isTransparent(rgb)
         component.positions.push([x, y])
         components[x][y] = component
@@ -134,7 +151,6 @@ class ImageSprite
         pixel = ImageSprite.getPixel(pixels, x, y)
         if not ImageSprite.isTransparent(pixel) and not components[x][y]?
           component = ImageSprite.bfs([x, y], id, pixels, components)
-          #console.log([x, y], component)
           componentByID[id] = component
           id += 1
 
@@ -157,7 +173,6 @@ class ImageSprite
         component.maxY = maxY
         component.width = 1 + maxX - minX
         component.height = 1 + maxY - minY
-        #console.log(minX, minY, maxX, maxY, component.width, component.height)
         canvasRet = createCanvas(component.width, component.height)
         for pos in component.positions
           rgba = ImageSprite.getPixel(pixels, pos[0], pos[1])
@@ -225,7 +240,7 @@ class Explosion extends HVAnimSprite
     @interval = 150
     super(@imgsrc, @animationIndices, @interval, callback)
 
-class Base extends HVAnimSprite
+class  extends HVAnimSprite
 
   constructor: (callback) ->
     @imgsrc = 'data/images/Buildings/base.bmp'
@@ -299,7 +314,7 @@ class BuyFactory2 extends BuyItem
     @sprite = sprite
     @cost = 200
     @damage = 5
-    @speed = 1.0
+    @fireRate = 100
     @range = 100
     super()
 
@@ -308,7 +323,7 @@ class BuyArtillery2 extends BuyItem
     @sprite = sprite
     @cost = 500
     @damage = 50
-    @speed = 5.0
+    @fireRate = 500
     @range = 250
     super()
 
@@ -414,6 +429,12 @@ class Creep
     @container.append(healthBar)
     @container.append(sprite.canvas)
 
+  midX: () ->
+    @pos.x + @container.width() / 2
+
+  midY: () ->
+    @pos.y + @container.height() / 2
+
   updateHealth: (health) ->
     @health = health
     if @health <= 0
@@ -433,17 +454,29 @@ class Creep
 
 class Tower
 
-  constructor: (pos, speed, damage, range) ->
+  constructor: ([x, y, width, height], spriteCanvas, fireRate, damage, range) ->
+    @container = HTML.div()
+    @container.append(spriteCanvas)
+    @container
+        .css('position', 'absolute')
+        .css('left', x)
+        .css('top', y)
+    @sprite = spriteCanvas
     @pos =
-      x: pos[0]
-      y: pos[1]
-    @width = pos[2]
-    @height = pos[3]
-    @speed = speed
+      x: x
+      y: y
+    @width = width
+    @height = height
+    @fireRate = fireRate
     @damage = damage
     @range = range
-    #@sprite = sprite
-    #@container = @sprite
+    @lastFire = Misc.getTime()
+
+  midX: () ->
+    @pos.x + @width / 2.0
+
+  midY: () ->
+    @pos.y + @height / 2.0
 
 class BuyActive
   constructor: (buyItem, cursorImage) ->
@@ -454,8 +487,8 @@ class BuyActive
 class BuyMenu
   constructor: (callback) ->
     buyMenu = @
-    bar = $("#buyMenu")
-    @container = bar
+    @container = HTML.div()
+    bar = @container
     await
       new Factory2Sprite(defer factorySprite)
       new Artillery2Sprite(defer artillerySprite)
@@ -496,7 +529,7 @@ class BuyMenu
   updateMoney: (money) ->
     @moneyContainer.html("Cash: " + money + Misc.CURRENCY)
 
-  setupMouseHandlers: (map, gameState, newMapObjectCallback) ->
+  setupMouseHandlers: (map, gameState) ->
     buyMenu = @
     map.on "mousemove", (ev) ->
       if buyMenu.active?
@@ -514,22 +547,10 @@ class BuyMenu
       buyMenu.hideCursor()
     map.click (ev) ->
       if buyMenu.active?
-        if gameState.money >= buyMenu.active.buyItem.cost
-          gameState.money -= buyMenu.active.buyItem.cost
-          buyMenu.updateMoney(gameState.money)
-          newCanvas = ImageSprite.cloneCanvas(buyMenu.active.cursorImage)
-          map.append(newCanvas)
-          x = ev.pageX - $(this).offset().left
-          y = ev.pageY - $(this).offset().top
-          [x, y] = Misc.snapToGrid(x, y)
-          $(newCanvas)
-            .css('position', 'absolute')
-            .css('left', x)
-            .css('top', y)
-          newMapObjectCallback([x, y], buyMenu.active)
-        else
-          Misc.displayError("Not enough money!")
-
+        x = ev.pageX - $(this).offset().left
+        y = ev.pageY - $(this).offset().top
+        [x, y] = Misc.snapToGrid(x, y)
+        gameState.buy(buyMenu, [x, y])
 
 class Map
   
@@ -613,7 +634,7 @@ class Wave4 extends Wave
   constructor: () ->
     @count = 1
     @speed = 1.0
-    @interval = 1000
+    @interval = 5000
     @health = 5000
     @prize = 500
     @spriteClass = MotherSprite
@@ -622,16 +643,30 @@ class Wave4 extends Wave
 class GameState
   constructor: () ->
     @wave = 0
-    @waveCompleted = 1
+    @nextWave = 1
+    @waveReady = false
     @inWave = false
     @map = null
     @creeps = []
     @towers = []
     @lives = 30
+    @money = 1000
+
+  start: () ->
+    @waveStart = Misc.getTime() + 30*1000
+    gameState = @
+    setInterval (() -> gameState.updateGameTimer()), 1000
+
+  waveFinished: () ->
+    not @inWave and not @waveReady and @creeps.length == 0
 
   startWave: () ->
-    if not @inWave
-      @wave += 1
+    if @waveFinished()
+      console.log("starting wave")
+      @inWave = true
+      @waveStarted = @waveStart
+      @waveStart = 0
+      @wave = @nextWave
       if @wave == 1
         wave = new Wave1()
         @startWaveP(wave)
@@ -645,8 +680,6 @@ class GameState
         wave = new Wave4()
         @startWaveP(wave)
 
-      @inWave = true
-
   startWaveP: (wave) ->
     path = [[0, @mapHeight / 2], [@mapWidth, @mapHeight / 2]]
     await
@@ -658,14 +691,12 @@ class GameState
       creep.id = i
       creep.startTime = cur + i * wave.interval
       @creeps.push(creep)
+    @waveReady = true
 
   frameCreeps: () ->
     d = new Date()
     cur = d.getTime()
-    mapdiv = @mapdiv
-    if @creeps.length == 0 and @inWave == true
-      @inWave = false
-      @waveCompleted += 1
+    mapContainer = @mapContainer
     aliveCreeps = []
     for creep in @creeps
       done = false
@@ -690,7 +721,7 @@ class GameState
           creep.health = 0
           done = true
           
-        mapdiv.append(creep.container)
+        mapContainer.append(creep.container)
         $(creep.container)
           .css "position", "absolute"
           .css "left", creep.pos.x
@@ -699,20 +730,26 @@ class GameState
         aliveCreeps.push(creep)
     @creeps = aliveCreeps
 
+  fireShot: (tower, creep) ->
+    dx = tower.midX() - creep.midX()
+    dy = tower.midY() - creep.midY()
+    creep.updateHealth(creep.health - tower.damage)
+    tower.lastFire = Misc.getTime()
+    degree = Math.atan(dy / dx)
+    Misc.rotate(tower.container, degree)
+
   frameTowers: () ->
-    d = new Date()
-    cur = d.getTime()
+    currentTime = Misc.getTime()
     for tower in @towers
       aliveCreeps = []
       for creep in @creeps
         if creep.active
-          dx = (tower.pos.x - creep.pos.x + tower.width / 2)
-          dy = (tower.pos.y - creep.pos.y + tower.height / 2)
+          dx = tower.midX() - creep.midX()
+          dy = tower.midY() - creep.midY()
           dist = Math.sqrt(dx * dx + dy * dy)
           if dist < tower.range
-            if not tower.lastFire? or (tower.lastFire? and cur - tower.lastFire > tower.speed * 100)
-              creep.updateHealth(creep.health - tower.damage)
-              tower.lastFire = cur
+            if currentTime - tower.lastFire > tower.fireRate
+              @fireShot(tower, creep)
           if creep.health > 0
             aliveCreeps.push(creep)
         else
@@ -721,7 +758,11 @@ class GameState
 
 
   frame: () ->
-    if @inWave
+    if @inWave and @waveReady
+      if @creeps.length == 0
+        @inWave = false
+        @waveReady = false
+        @nextWave += 1
       @frameCreeps()
       @frameTowers()
 
@@ -732,19 +773,37 @@ class GameState
     seconds = Math.round((gameState.waveStart - cur) / 1000)
     if seconds >= 0
       $("#gametimer").html("Next wave in " + seconds + " seconds")
-    else
+    else if gameState.waveStarted?
       gameState.startWave()
-      d = new Date(cur - gameState.waveStart)
+      d = new Date(cur - gameState.waveStarted)
       $("#gametimer").html("Wave timer: #{d.getMinutes()}:#{d.getSeconds()}")
 
   updateLives: () ->
     $("#lives").html("Lives left: #{@lives}")
 
+  buy: (buyMenu, [x, y]) ->
+    gameState = @
+    buyActive = buyMenu.active
+    buyItem = buyMenu.active.buyItem
+    if gameState.money >= buyItem.cost
+      gameState.money -= buyItem.cost
+      buyMenu.updateMoney(gameState.money)
+      # TODO: assign a loaded sprite to buyItem on creation
+      newCanvas = ImageSprite.cloneCanvas(buyActive.cursorImage)
+      [width, height] = [buyActive.cursorImage.width, buyActive.cursorImage.height]
+      buyItem = buyActive.buyItem
+      tower = new Tower([x, y, width, height], newCanvas, buyItem.fireRate, buyItem.damage, buyItem.range)
+      @mapContainer.append(tower.container)
+      gameState.towers.push(tower)
+    else
+      Misc.displayError("Not enough money!")
+
+
 class CoffeeMain
   constructor: () ->
     @
 
-  loadImage: () ->
+  loadGame: () ->
     main = $("#maincontent")
     main.empty()
     main.css("height", "100%")
@@ -761,20 +820,19 @@ class CoffeeMain
     gameState = new GameState()
     gameState.mapWidth = mapWidth
     gameState.mapHeight = mapHeight
-    gameState.money = 1000
-    gameState.turrets = []
-    gameState.waveStart = new Date().getTime() + 30*1000
-    setInterval (() -> gameState.updateGameTimer()), 1000
+    gameState.start()
 
-    mapdiv = HTML.div()
+    mapContainer = HTML.div()
       .css('width', mapWidth)
       .css('height', mapHeight)
-    main.append(mapdiv)
+    main.append(mapContainer)
+
     mapCanvas = HTML.canvas('')
-    #mapdiv.append(mapCanvas)
+    #mapContainer.append(mapCanvas)
     mapCanvas
       .css('width', mapWidth)
       .css('height', mapHeight)
+
     #base = new Base(basediv)
     #crt = new Factory2(crtdiv)
     
@@ -783,7 +841,7 @@ class CoffeeMain
       new Map(mapWidth, mapHeight, defer map)
       new BuyMenu(defer buyMenu)
 
-    gameState.mapdiv = mapdiv
+    gameState.mapContainer = mapContainer
     gameState.smallExplosion = explosion
     gameState.winPrize = (prize) ->
       # TODO: animate money rising up from corpse
@@ -795,27 +853,50 @@ class CoffeeMain
     gameState.updateLives()
    
     for canvas in map.terrain
-      mapdiv.append(canvas)
+      mapContainer.append(canvas)
+    
+    buyMenuDOM = $("#buyMenu")
+    buyMenuDOM.empty()
+    buyMenuDOM.append(buyMenu.container)
     
     # Logic to handle buying items
     buyMenu.updateMoney(gameState.money)
-    buyMenu.setupMouseHandlers main, gameState, ([x, y], buyActive) ->
-      [width, height] = [buyActive.cursorImage.width, buyActive.cursorImage.height]
-      tower = new Tower([x, y, width, height], buyActive.buyItem.speed, buyActive.buyItem.damage, buyActive.buyItem.range)
-      gameState.towers.push(tower)
+    buyMenu.setupMouseHandlers mapContainer, gameState
 
     $("#startNext").click () ->
       Misc.displayMessage("Wave starting!")
-      gameState.waveStart = new Date().getTime() + 1000
+      gameState.waveStart = Misc.getTime()
+      gameState.startWave()
 
     setInterval (() -> gameState.frame()), 100
+
+  todo: () ->
+    main = $("#maincontent")
+    main.empty()
+    todo = HTML.ul()
+    main.append(todo)
+    todoItems = [
+      'make creeps disappear when they reach end of map',
+      'add base animation for towers',
+      'add tower fire animation',
+      'make towers rotate when they shoot',
+      'add circle for range when placing tower',
+      'animate money rising up from dead creep',
+      'create map editor',
+    ]
+    for item in todoItems
+      todo.append(HTML.li(item))
+
     
 
   main: () ->
     console.log("main")
+    main = @
           
     $('a[href*="#buy"]').click () ->
-      @loadImage()
-    @loadImage()
+      main.loadGame()
+    $('a[href*="#todo"]').click () ->
+      main.todo()
+    @loadGame()
 
 window.CoffeeMain = new CoffeeMain()
