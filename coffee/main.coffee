@@ -1,5 +1,296 @@
+spritePaths = '''./Buildings/Artilery2.bmp
+./Buildings/ArtlFire.bmp
+./Buildings/Base.bmp
+./Buildings/Build1.bmp
+./Buildings/Build2.bmp
+./Buildings/Build3.bmp
+./Buildings/Build4.bmp
+./Buildings/Build5.bmp
+./Buildings/Build6.bmp
+./Buildings/Build7.bmp
+./Buildings/BuildingBottom.bmp
+./Buildings/Creation.bmp
+./Buildings/Creatn2a.bmp
+./Buildings/Creatn2b.bmp
+./Buildings/Cube.bmp
+./Buildings/Factory2.bmp
+./Buildings/Factory3.bmp
+./Buildings/Field.bmp
+./Buildings/Generator.bmp
+./Buildings/MinerAni.bmp
+./Buildings/MinerDst.bmp
+./Buildings/MinerShd.bmp
+./Buildings/MinerTop.bmp
+./Buildings/Module.bmp
+./Buildings/Platform.bmp
+./Buildings/Random.bmp
+./Buildings/Silo.bmp
+./Buildings/StarDest.bmp
+./Buildings/Starport.bmp
+./Buildings/Starprt2.bmp
+./Buildings/Storage1.bmp
+./Buildings/Televatr.bmp
+./Buildings/Televtr2.bmp
+./Buildings/TradPlat.bmp
+./Buildings/Turret.bmp
+./Buildings/Wall.bmp
+./Buildings/WallDest.bmp
+./Interface/BuyButtn.bmp
+./Interface/Dialog2.bmp
+./Interface/Dialog3.bmp
+./Interface/Dialogue.bmp
+./Interface/Exit.lbm.bmp
+./Interface/grid.bmp
+./Interface/InfoEmbs.bmp
+./Interface/IntButn2.bmp
+./Interface/IntButtn.bmp
+./Interface/IntfcBuy.bmp
+./Interface/IntInfo.bmp
+./Interface/IntOptn2.bmp
+./Interface/Intrfac3.bmp
+./Interface/Intrfac4.bmp
+./Interface/Intrface.bmp
+./Interface/Intrface2.bmp
+./Interface/Mission.bmp
+./Interface/MsnChoos.bmp
+./Interface/MsnChs2.bmp
+./Misc/ArtlFlsh.bmp
+./Misc/Blood1.bmp
+./Misc/Bullet.1.bmp
+./Misc/Bullet2.bmp
+./Misc/Bullets.bmp
+./Misc/Cloud1.bmp
+./Misc/Cloud2.bmp
+./Misc/Cloud3.bmp
+./Misc/Cursor1.bmp
+./Misc/Dark.bmp
+./Misc/Electric.bmp
+./Misc/Embossed.bmp
+./Misc/exploBig.bmp
+./Misc/explosn.bmp
+./Misc/expSmall.bmp
+./Misc/Face1.bmp
+./Misc/Flag.bmp
+./Misc/Flame.bmp
+./Misc/Font.bmp
+./Misc/Icons.bmp
+./Misc/Junk.bmp
+./Misc/Marker.bmp
+./Misc/Mines.bmp
+./Misc/Muzzle.bmp
+./Misc/Objects.bmp
+./Misc/Outline.bmp
+./Misc/Outline2.bmp
+./Misc/Selected.bmp
+./Misc/Teleport.bmp
+./Misc/Teleprt2.bmp
+./Misc/Test1.bmp
+./Misc/Test2.bmp
+./Misc/Test3.bmp
+./Misc/Test4.bmp
+./Terrain/Cave.bmp
+./Terrain/Cliffmask.bmp
+./Terrain/Crater.bmp
+./Terrain/Crtr2Lav.bmp
+./Terrain/Crtr2Wtr.bmp
+./Terrain/CrtrJnt.bmp
+./Terrain/CrtrMisc.bmp
+./Terrain/CrtrRDst.bmp
+./Terrain/CrtrRoad.bmp
+./Terrain/GrasClif.bmp
+./Terrain/GrasRoad.bmp
+./Terrain/Grass.bmp
+./Terrain/Grass2.bmp
+./Terrain/GrassRDst.bmp
+./Terrain/Grs2CrtB.bmp
+./Terrain/Grs2Crtc.bmp
+./Terrain/Grs2Crtr.bmp
+./Terrain/Grs2Mnt.bmp
+./Terrain/Grs2Watr.bmp
+./Terrain/Grss2Lav.bmp
+./Terrain/GrssCrtr.bmp
+./Terrain/GrssMisc.bmp
+./Terrain/Ice2Snow.bmp
+./Terrain/Ice2Watr.bmp
+./Terrain/IceBrk1.bmp
+./Terrain/IceBrk2.bmp
+./Terrain/IceDent.bmp
+./Terrain/IceRDest.bmp
+./Terrain/IceRoad.bmp
+./Terrain/Icicle.bmp
+./Terrain/Icicle2.bmp
+./Terrain/Icicle3.bmp
+./Terrain/Lava.bmp
+./Terrain/LavaBubl.bmp
+./Terrain/LavaFlow.bmp
+./Terrain/LavaRDest.bmp
+./Terrain/LavaRoad.bmp
+./Terrain/Mnt2Crtb.bmp
+./Terrain/Mnt2Crtc.bmp
+./Terrain/Mnt2Crtr.bmp
+./Terrain/Mnt2Lava.bmp
+./Terrain/Mnt2Sand.bmp
+./Terrain/Mnt2Watr.bmp
+./Terrain/MntCliff.bmp
+./Terrain/MntMisc.bmp
+./Terrain/MntRDst.bmp
+./Terrain/MntRoad.bmp
+./Terrain/Mountains.bmp
+./Terrain/Road.bmp
+./Terrain/RoadDest.bmp
+./Terrain/RoadJnt.bmp
+./Terrain/RoadSnw2.bmp
+./Terrain/Rock.bmp
+./Terrain/Rock2.bmp
+./Terrain/Sand.bmp
+./Terrain/Sand2Lav.bmp
+./Terrain/SandCrtr.bmp
+./Terrain/SandMisc.bmp
+./Terrain/SandRDst.bmp
+./Terrain/SandRoad.bmp
+./Terrain/Sn2-2Crb.bmp
+./Terrain/Sn2-2Crc.bmp
+./Terrain/Sn2-2Wtr.bmp
+./Terrain/Sn2-Clif.bmp
+./Terrain/Sn2-RDst.bmp
+./Terrain/Sn22Crtr.bmp
+./Terrain/Snd2Crtb.bmp
+./Terrain/Snd2Crtc.bmp
+./Terrain/Snd2Crtr.bmp
+./Terrain/Snd2Watr.bmp
+./Terrain/SndCliff.bmp
+./Terrain/Snow.bmp
+./Terrain/Snow2.bmp
+./Terrain/Snw2-Ct2.bmp
+./Terrain/Snw2-Ctr.bmp
+./Terrain/Snw2-Lav.bmp
+./Terrain/Snw2-Rck.bmp
+./Terrain/Snw2-Rck2.bmp
+./Terrain/Snw2-Rck3.bmp
+./Terrain/Snw2Crtb.bmp
+./Terrain/Snw2Crtc.bmp
+./Terrain/Snw2Crtr.bmp
+./Terrain/Snw2Lav.bmp
+./Terrain/Snw2Mnt.bmp
+./Terrain/Snw2Watr.bmp
+./Terrain/SnwCliff.bmp
+./Terrain/SnwCratr.bmp
+./Terrain/Stn2Crtb.bmp
+./Terrain/Stn2Crtc.bmp
+./Terrain/Stn2Crtr.bmp
+./Terrain/Stn2Lav.bmp
+./Terrain/Stn2SnwB.bmp
+./Terrain/Stn2Watr.bmp
+./Terrain/StnCliff.bmp
+./Terrain/StnCratr.bmp
+./Terrain/Stne2Snw.bmp
+./Terrain/StneRoad.bmp
+./Terrain/StnMisc.bmp
+./Terrain/StnRDst.bmp
+./Terrain/StnRock1.bmp
+./Terrain/StnRock2.bmp
+./Terrain/Stone.bmp
+./Terrain/Swamp.bmp
+./Terrain/SwmpAni.bmp
+./Terrain/SwmpBubl.bmp
+./Terrain/SwmpPlnt.bmp
+./Terrain/SwmpRDst.bmp
+./Terrain/SwmpRoad.bmp
+./Terrain/SwmpRock.bmp
+./Terrain/Tch2CrtB.bmp
+./Terrain/Tch2Crtc.bmp
+./Terrain/Tch2Crtr.bmp
+./Terrain/Tch2Lava.bmp
+./Terrain/Tch2Watr.bmp
+./Terrain/TchCliff.bmp
+./Terrain/Tech.bmp
+./Terrain/TechMsc1.bmp
+./Terrain/TechRDst.bmp
+./Terrain/TechRoad.bmp
+./Terrain/TreeAsh.bmp
+./Terrain/TreeGrs.bmp
+./Terrain/Trees.bmp
+./Terrain/Water.bmp
+./Terrain/Water2.bmp
+./Terrain/WatrFlow.bmp
+./Terrain/WatrRDst.bmp
+./Terrain/WatrRoad.bmp
+./Vehicles/Artil.bmp
+./Vehicles/Artil2.bmp
+./Vehicles/Artil3.bmp
+./Vehicles/Artl3Shd.bmp
+./Vehicles/Balloon1.bmp
+./Vehicles/Beast.bmp
+./Vehicles/Boat1.bmp
+./Vehicles/Boat2.bmp
+./Vehicles/Boat3.bmp
+./Vehicles/Builder1.bmp
+./Vehicles/Builder2.bmp
+./Vehicles/Builder3.bmp
+./Vehicles/Builder4.bmp
+./Vehicles/Builder5.bmp
+./Vehicles/Copter.bmp
+./Vehicles/Copter2.bmp
+./Vehicles/Copter2a.bmp
+./Vehicles/Copter2b.bmp
+./Vehicles/CptrShd1.bmp
+./Vehicles/CptrShd2.bmp
+./Vehicles/Crow.bmp
+./Vehicles/Gull.bmp
+./Vehicles/Mech.bmp
+./Vehicles/Miner.bmp
+./Vehicles/Mother.bmp
+./Vehicles/Mother2.bmp
+./Vehicles/Mother2B.bmp
+./Vehicles/Mother2c.bmp
+./Vehicles/Scout1.bmp
+./Vehicles/Scout2.bmp
+./Vehicles/SeaMnstr.bmp
+./Vehicles/Seed.bmp
+./Vehicles/SeedShad.bmp
+./Vehicles/Shadow.bmp
+./Vehicles/Ship1.bmp
+./Vehicles/Ship2.bmp
+./Vehicles/Ship3.bmp
+./Vehicles/Tank1.bmp
+./Vehicles/Tank10.bmp
+./Vehicles/Tank11.bmp
+./Vehicles/Tank12.bmp
+./Vehicles/Tank13.bmp
+./Vehicles/Tank14.bmp
+./Vehicles/Tank15.bmp
+./Vehicles/Tank16.bmp
+./Vehicles/Tank2.bmp
+./Vehicles/Tank3.bmp
+./Vehicles/Tank3Shd.bmp
+./Vehicles/Tank4.bmp
+./Vehicles/Tank5.bmp
+./Vehicles/Tank5A.bmp
+./Vehicles/Tank5b.bmp
+./Vehicles/Tank5c.bmp
+./Vehicles/Tank5d.bmp
+./Vehicles/Tank6.bmp
+./Vehicles/Tank7.bmp
+./Vehicles/Tank8.bmp
+./Vehicles/Tank9.bmp
+./Vehicles/TankB1.bmp
+./Vehicles/TankB2.bmp
+./Vehicles/TankBase.bmp
+./Vehicles/TnkTurt1.bmp
+./Vehicles/TnkTurt2.bmp
+./Vehicles/Transprt.bmp'''
+
+
 class Misc
   @CURRENCY = "$"
+  @SPRITE_DIR = 'data/images/'
+  @BUILDING_ANIM_INTERVAL = 100
+
+  @move: (obj, [x, y]) ->
+    obj.css
+      position: 'absolute'
+      top: y
+      left: x
 
   @snapToGrid: (x, y) ->
       sz = 40
@@ -76,15 +367,31 @@ class ImageSprite
     #return the new canvas
     newCanvas
 
-  #"#008A76"
-  @transparent =
+  @transparents = []
+  @transparents.push
     r: 0x00
     g: 0x8a
     b: 0x76
-  @transparent2 =
+  @transparents.push
     r: 0x40
     g: 0x60
     b: 0x80
+  @transparents.push
+    r: 0x45
+    g: 0x4e
+    b: 0x5b
+  @transparents.push
+    r: 0x80
+    g: 0x74
+    b: 0x79
+  @transparents.push
+    r: 0x2f
+    g: 0x48
+    b: 0x61
+  @transparents.push
+    r: 0x00
+    g: 0xFF
+    b: 0x00
 
   @getPixel: (pixels, x, y) ->
     colorsize = pixels.data.length / (pixels.height * pixels.width)
@@ -103,11 +410,18 @@ class ImageSprite
     pixels.data[i+2] = rgba.b
     pixels.data[i+3] = rgba.a
 
-  @isTransparent: (rgb) ->
-    rgb.r == @transparent.r && rgb.g == @transparent.g && rgb.b == @transparent.b ||
-    rgb.r == @transparent2.r && rgb.g == @transparent2.g && rgb.b == @transparent2.b
+  @isTransparent: (pixels, rgb) ->
+    #for transparent, i in @transparents
+    #  if rgb.r == transparent.r && rgb.g == transparent.g && rgb.b == transparent.b
+    #    return true
+    #return false
+    transparent = @getPixel(pixels, 1, 0) # guesswork, works for most sprites
+    rgb.r == transparent.r && rgb.g == transparent.g && rgb.b == transparent.b
 
   @bfs: ([px, py], id, pixels, components) ->
+    transparent = @getPixel(pixels, 0, 0)
+    isTransparent = (rgb) ->
+      rgb.r == transparent.r && rgb.g == transparent.g && rgb.b == transparent.b
     colorsize = pixels.data.length / (pixels.height * pixels.width)
     neighbours = []
     for x in [-1,0,1]
@@ -122,7 +436,7 @@ class ImageSprite
     while queue.length > 0
       [x, y] = queue.pop()
       rgb = @getPixel(pixels, x, y)
-      if not @isTransparent(rgb)
+      if not @isTransparent(pixels, rgb)
         component.positions.push([x, y])
         components[x][y] = component
         for n in neighbours
@@ -167,7 +481,7 @@ class ImageSprite
     for y in [0..height-1]
       for x in [0..width-1]
         pixel = ImageSprite.getPixel(pixels, x, y)
-        if not ImageSprite.isTransparent(pixel) and not components[x][y]?
+        if not ImageSprite.isTransparent(pixels, pixel) and not components[x][y]?
           component = ImageSprite.bfs([x, y], id, pixels, components)
           componentByID[id] = component
           id += 1
@@ -238,6 +552,7 @@ class HVAnimSprite
 
   constructor: (imgsrc, animationIndices, interval, callback) ->
     sprite = @
+    imgsrc = Misc.SPRITE_DIR + imgsrc
     if callback
       texture = new Image()
       texture.onload = () ->
@@ -274,7 +589,7 @@ class HVAnimSprite
 class Explosion extends HVAnimSprite
 
   constructor: (callback) ->
-    @imgsrc = 'data/images/Misc/expSmall.bmp'
+    @imgsrc = 'Misc/expSmall.bmp'
     @animationIndices = [0..6]
     @interval = 150
     super(@imgsrc, @animationIndices, @interval, callback)
@@ -282,7 +597,7 @@ class Explosion extends HVAnimSprite
 class BigExplosion extends HVAnimSprite
 
   constructor: (callback) ->
-    @imgsrc = 'data/images/Misc/exploBig.bmp'
+    @imgsrc = 'Misc/exploBig.bmp'
     @animationIndices = [0..13]
     @interval = 150
     super(@imgsrc, @animationIndices, @interval, callback)
@@ -290,7 +605,7 @@ class BigExplosion extends HVAnimSprite
 class  extends HVAnimSprite
 
   constructor: (callback) ->
-    @imgsrc = 'data/images/Buildings/base.bmp'
+    @imgsrc = 'Buildings/base.bmp'
     @animationIndices = [0,0,0,0,0,1,2,3,2,1,0,0,0,0,0]
     @interval = 150
     super(@imgsrc, @animationIndices, @interval, callback)
@@ -298,7 +613,7 @@ class  extends HVAnimSprite
 class Creation2AAnim extends HVAnimSprite
 
   constructor: (callback) ->
-    @imgsrc = 'data/images/Buildings/Creatn2a.bmp'
+    @imgsrc = 'Buildings/Creatn2a.bmp'
     @animationIndices = [0,1,2,3,4,9,8,7,6,5,10,11,12,13,14]
     @interval = 150
     super(@imgsrc, @animationIndices, @interval, callback)
@@ -306,17 +621,30 @@ class Creation2AAnim extends HVAnimSprite
 class Factory2Anim extends HVAnimSprite
 
   constructor: (callback) ->
-    @imgsrc = 'data/images/Buildings/Factory2.bmp'
+    @imgsrc = 'Buildings/Factory2.bmp'
     @animationIndices = [0,1,2,3,4,5,7,8,9,10,9,8,7,5,4,3,2,1]
     @interval = 50
     super(@imgsrc, @animationIndices, @interval, callback)
 
 class FixedSpriteDebug
 
-  constructor: (imgsrc) ->
+  constructor: (imgsrc, index, callback) ->
+    @container = HTML.div()
+    sprite = @
+    imgsrc = Misc.SPRITE_DIR + imgsrc
     texture = new Image()
     texture.onload = () ->
       canvases = ImageSprite.getParts(texture)
+      for c, i in canvases
+        $(c).css
+          width: c.width * 2
+          height: c.height * 2
+        link = HTML.a c,
+          href: imgsrc
+          title: i
+        sprite.container.append(link)
+      sprite.canvas = canvases[index]
+      callback(sprite)
     texture.src = imgsrc
 
 class FixedSprite
@@ -325,17 +653,18 @@ class FixedSprite
     @imgsrc = imgsrc
     @index = index
     @container = HTML.div()
+    imgsrc = Misc.SPRITE_DIR + imgsrc
     if callback?
       texture = new Image()
-      terrainSprite = @
+      sprite = @
       texture.onload = () ->
         canvases = ImageSprite.getParts(texture)
         if not canvases[index]?
           throw "incorrect sprite index #{index} for #{imgsrc}"
-        terrainSprite.canvases = canvases
-        terrainSprite.canvas = canvases[index]
-        terrainSprite.container.append(terrainSprite.canvas)
-        callback(terrainSprite)
+        sprite.canvases = canvases
+        sprite.canvas = canvases[index]
+        sprite.container.append(sprite.canvas)
+        callback(sprite)
       texture.src = imgsrc
 
   setIndex: (index) ->
@@ -369,27 +698,41 @@ class BuyItem
 
 class BuyFactory2 extends BuyItem
 
-  constructor: (buyMenuSprite, mapSprite) ->
-    @sprite = buyMenuSprite
+  constructor: (sprites) ->
+    @sprite = sprites.factory
     @cost = 200
     @damage = 25
     @fireRate = 100
     @range = 100
     @startRotation = 0
-    @mapSprite = mapSprite
+    @mapSprite = sprites.mapFactory
     super()
 
 class BuyArtillery2 extends BuyItem
 
-  constructor: (buyMenuSprite, mapSprite) ->
-    @sprite = buyMenuSprite
+  constructor: (sprites) ->
+    @sprite = sprites.artillery
     @cost = 500
     @damage = 50
     @fireRate = 500
     @range = 250
     @startRotation = Math.PI / 4 #3 * Math.PI / 8
-    @mapSprite = mapSprite
+    @mapSprite = sprites.mapArtillery
     super()
+
+class BuyGenerator extends BuyItem
+
+  constructor: (sprites) ->
+    @sprite = sprites.generator
+    @cost = 800
+    @damage = 50
+    @fireRate = 100
+    @range = 250
+    @startRotation = Math.PI / 4 #3 * Math.PI / 8
+    @mapSprite = sprites.mapGenerator
+    super()
+
+
 
 class Direction
   constructor: (spriteIndex, radians) ->
@@ -425,82 +768,58 @@ class DirectionIndices
 class BulletSprite extends FixedSprite
 
   constructor: (callback) ->
-    @imgsrc = 'data/images/Misc/Bullets.bmp'
+    @imgsrc = 'Misc/Bullets.bmp'
     @rotation = 3 * Math.pi / 8
     super(@imgsrc, 1, callback)
 
 class Artillery2Sprite extends FixedSprite
  
   constructor: (callback) ->
-    @imgsrc = 'data/images/Buildings/Artilery2.bmp'
+    @imgsrc = 'Buildings/Artilery2.bmp'
     super(@imgsrc, 0, callback)
 
 class Factory2Sprite extends FixedSprite
  
   constructor: (callback) ->
-    @imgsrc = 'data/images/Buildings/Factory2.bmp'
+    @imgsrc = 'Buildings/Factory2.bmp'
     super(@imgsrc, 1, callback)
 
-class GrassTop extends FixedSprite
+class GrassSprite extends FixedSprite
  
-  constructor: (callback) ->
-    @imgsrc = 'data/images/Terrain/Grass.bmp'
-    super(@imgsrc, 1, callback)
-
-class GrassLeft extends FixedSprite
- 
-  constructor: (callback) ->
-    @imgsrc = 'data/images/Terrain/Grass.bmp'
-    super(@imgsrc, 3, callback)
-
-class GrassMid extends FixedSprite
- 
-  constructor: (callback) ->
-    @imgsrc = 'data/images/Terrain/Grass.bmp'
-    super(@imgsrc, 4, callback)
-
-class GrassTopLeft extends FixedSprite
- 
-  constructor: (callback) ->
-    @imgsrc = 'data/images/Terrain/Grass.bmp'
-    super(@imgsrc, 0, callback)
-
-class GrassTopRight extends FixedSprite
- 
-  constructor: (callback) ->
-    @imgsrc = 'data/images/Terrain/Grass.bmp'
-    super(@imgsrc, 2, callback)
+  constructor: (index, callback) ->
+    @imgsrc = 'Terrain/Grass.bmp'
+    super(@imgsrc, index, callback)
 
 class DirectedSprite extends FixedSprite
 
 class Tank1Sprite extends FixedSprite
 
   constructor: (callback) ->
-    @imgsrc = 'data/images/Vehicles/Tank1.bmp'
+    @imgsrc = 'Vehicles/Tank1.bmp'
     super(@imgsrc, 4, callback)
 
 class Tank2Sprite extends FixedSprite
 
   constructor: (callback) ->
-    @imgsrc = 'data/images/Vehicles/Tank2.bmp'
+    @imgsrc = 'Vehicles/Tank2.bmp'
     super(@imgsrc, 4, callback)
 
 class Tank5Sprite extends FixedSprite
 
   constructor: (callback) ->
-    @imgsrc = 'data/images/Vehicles/Tank5.bmp'
+    @imgsrc = 'Vehicles/Tank5.bmp'
     super(@imgsrc, 4, callback)
 
 class Tank14Sprite extends FixedSprite
 
   constructor: (callback) ->
-    @imgsrc = 'data/images/Vehicles/Tank14.bmp'
+    @imgsrc = 'Vehicles/Tank14.bmp'
     super(@imgsrc, 4, callback)
 
 class MotherSprite extends FixedSprite
 
   constructor: (callback) ->
-    @imgsrc = 'data/images/Vehicles/Mother.bmp'
+    @imgsrc = 'Vehicles/Mother.bmp'
     super(@imgsrc, 0, callback)
 
 class Bullet
@@ -606,22 +925,23 @@ class BuyActive
 
 class BuyMenu
 
-  createActive: (buyItem, sprite) ->
-      cursor = HTML.div().addClass("circle").addClass("buyItem-cursor")
-      cursor
-        .css
-          width: buyItem.range
-          height: buyItem.range
-      canvas = ImageSprite.cloneCanvas(sprite.canvas)
-      cursor.canvas = canvas
-      cursor.append(canvas)
-      $(canvas)
-        .css
-          position: "absolute"
-          left: buyItem.range / 2 - sprite.canvas.width / 2
-          top: buyItem.range / 2 - sprite.canvas.height / 2
+  createActive: (buyItem) ->
+    sprite = buyItem.sprite
+    cursor = HTML.div().addClass("circle").addClass("buyItem-cursor")
+    cursor
+      .css
+        width: buyItem.range
+        height: buyItem.range
+    canvas = ImageSprite.cloneCanvas(sprite.canvas)
+    cursor.canvas = canvas
+    cursor.append(canvas)
+    $(canvas)
+      .css
+        position: "absolute"
+        left: buyItem.range / 2 - sprite.canvas.width / 2
+        top: buyItem.range / 2 - sprite.canvas.height / 2
 
-      buyActive = new BuyActive(buyItem, cursor)
+    buyActive = new BuyActive(buyItem, cursor)
 
   constructor: (gameState, callback) ->
     buyMenu = @
@@ -630,17 +950,19 @@ class BuyMenu
 
     sprites = gameState.sprites
    
-    buyItem = new BuyFactory2(sprites.factorySprite, sprites.mapFactorySprite)
-    buyActive = @createActive(buyItem, sprites.factorySprite)
-    bar.append(buyItem.container)
-    buyItem.container.click do (buyActive) -> () -> buyMenu.setActive buyActive
+    buyActives = []
 
-    buyMenu.setActive(buyActive)
+    buyActives.push(@createActive(new BuyFactory2(sprites)))
+    buyActives.push(@createActive(new BuyArtillery2(sprites)))
+    buyActives.push(@createActive(new BuyGenerator(sprites)))
 
-    buyItem = new BuyArtillery2(sprites.artillerySprite, sprites.mapArtillerySprite)
-    buyActive = @createActive(buyItem, sprites.artillerySprite)
-    bar.append(buyItem.container)
-    buyItem.container.click do (buyActive) -> () -> buyMenu.setActive buyActive
+    for buyActive in buyActives
+      buyItem = buyActive.buyItem
+      bar.append(buyItem.container)
+      buyItem.container.click do (buyActive) -> () -> buyMenu.setActive buyActive
+
+    buyMenu.setActive(buyActives[0])
+
 
     @moneyContainer = HTML.div().addClass("money")
     bar.append(@moneyContainer)
@@ -699,37 +1021,51 @@ class Map
     sprites = gameState.sprites
 
     sprite = sprites.grassTopLeft.clone()
-    $(sprite.container)
-      .css('position', 'absolute')
-      .css('left', 0)
-      .css('top', 0)
+    Misc.move $(sprite.container), [0, 0]
     terrain.push(sprite.container)
 
     sprite = sprites.grassTopRight.clone()
-    $(sprite.container)
-      .css('position', 'absolute')
-      .css('left', mapWidth - sprite.canvas.width)
-      .css('top', 0)
+    Misc.move $(sprite.container), [mapWidth - sprite.canvas.width, 0]
     terrain.push(sprite.container)
 
-    sprite = sprites.grassTop
+    sprite = sprites.grassBottomLeft.clone()
+    Misc.move $(sprite.container), [0, mapHeight - sprite.canvas.height]
+    terrain.push(sprite.container)
+
+    sprite = sprites.grassBottomRight.clone()
+    Misc.move $(sprite.container), [mapWidth - sprite.canvas.width, mapHeight - sprite.canvas.height]
+    terrain.push(sprite.container)
+
+    sprite = sprites.grassTopMid
     for x in [1..(mapWidth / sprite.canvas.width) - 2]
       clone = sprite.clone()
       terrain.push(clone.container)
-      $(clone.container)
-        .css('position', 'absolute')
-        .css('left', x * sprite.canvas.width)
-        .css('top', 0)
+      Misc.move $(clone.container), [x*sprite.canvas.width, 0]
+    
+    sprite = sprites.grassMidLeft
+    for y in [1..(mapHeight / sprite.canvas.height) - 2]
+      clone = sprite.clone()
+      terrain.push(clone.container)
+      Misc.move $(clone.container), [0, y*sprite.canvas.height]
+ 
+    sprite = sprites.grassMidRight
+    for y in [1..(mapHeight / sprite.canvas.height) - 2]
+      clone = sprite.clone()
+      terrain.push(clone.container)
+      Misc.move $(clone.container), [mapWidth - sprite.canvas.width, y*sprite.canvas.height]
 
-    sprite = sprites.grassMid.clone()
-    for x in [0..(mapWidth / sprite.canvas.width)-1]
-      for y in [1..(mapHeight / sprite.canvas.height)-1]
+    sprite = sprites.grassBottomMid
+    for x in [1..(mapWidth / sprite.canvas.width) - 2]
+      clone = sprite.clone()
+      terrain.push(clone.container)
+      Misc.move $(clone.container), [x*sprite.canvas.width, mapHeight - sprite.canvas.height]
+
+    sprite = sprites.grassMidMid.clone()
+    for x in [1..(mapWidth / sprite.canvas.width)-2]
+      for y in [1..(mapHeight / sprite.canvas.height)-2]
         clone = sprite.clone()
         terrain.push(clone.container)
-        $(clone.container)
-          .css('position', 'absolute')
-          .css('left', x * sprite.canvas.width)
-          .css('top', y * sprite.canvas.height)
+        Misc.move $(clone.container), [x*sprite.canvas.width, y*sprite.canvas.height]
 
 class Wave
 
@@ -778,14 +1114,21 @@ class Sprites
       new BulletSprite(defer @bullet)
       new Explosion(defer @smallExplosion)
       new BigExplosion(defer @bigExplosion)
-      new Factory2Sprite(defer @factorySprite)
-      new Factory2Anim(defer @mapFactorySprite)
-      new Artillery2Sprite(defer @artillerySprite)
-      new Artillery2Sprite(defer @mapArtillerySprite)
-      new GrassTopLeft(defer @grassTopLeft)
-      new GrassTop(defer @grassTop)
-      new GrassTopRight(defer @grassTopRight)
-      new GrassMid(defer @grassMid)
+      new Factory2Sprite(defer @factory)
+      new Factory2Anim(defer @mapFactory)
+      new Artillery2Sprite(defer @artillery)
+      new Artillery2Sprite(defer @mapArtillery)
+      new FixedSprite('Buildings/Generator.bmp', 0, defer @generator)
+      new HVAnimSprite('Buildings/Generator.bmp', [0..14], Misc.BUILDING_ANIM_INTERVAL, defer @mapGenerator)
+      new GrassSprite(0, defer @grassTopLeft)
+      new GrassSprite(1, defer @grassTopMid)
+      new GrassSprite(2, defer @grassTopRight)
+      new GrassSprite(3, defer @grassMidLeft)
+      new GrassSprite(4, defer @grassMidMid)
+      new GrassSprite(5, defer @grassMidRight)
+      new GrassSprite(6, defer @grassBottomLeft)
+      new GrassSprite(7, defer @grassBottomMid)
+      new GrassSprite(8, defer @grassBottomRight)
     callback(@)
 
 class GameState
@@ -1102,11 +1445,24 @@ class CoffeeMain
       'create map editor',
       'click tower to see properties and statistics',
       'DPS overlay',
-      'disallow multiple towers in same location'
+      'disallow multiple towers in same location',
+      'implement game over after all lives lost',
+      'add support for AOE damage, add some towers'
     ]
     for item in todoItems
       todo.append(HTML.li(item))
 
+  sprites: () ->
+    main = $("#maincontent")
+    main.empty()
+    sprites = []
+    await
+      for sprite, i in spritePaths.split('\n')
+        spritePath = Misc.SPRITE_DIR + sprite
+        console.log("loading", spritePath)
+        new FixedSpriteDebug(sprite, 0, (defer sprites[i]))
+    for sprite in sprites
+      main.append(sprite.container)
     
 
   main: () ->
@@ -1117,6 +1473,10 @@ class CoffeeMain
       main.loadGame()
     $('a[href*="#todo"]').click () ->
       main.todo()
+    $('a[href*="#sprites"]').click () ->
+      main.sprites()
+    $('a[href*="#mapEditor"]').click () ->
+      main.sprites()
     @loadGame()
 
 window.CoffeeMain = new CoffeeMain()

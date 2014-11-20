@@ -2,6 +2,10 @@
   border: 3px solid red;
 }
 
+.buymenu-item {
+  display: table-cell;
+}
+
 .buymenu-item:hover {
   border: 3px solid red;
 }
