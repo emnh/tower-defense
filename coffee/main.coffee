@@ -1022,7 +1022,9 @@ class CoffeeMain
   loadGame: () ->
     main = $("#maincontent")
     main.empty()
-    main.css("height", "100%")
+    #main.css("height", "100%")
+    main.css
+      height: "800px"
     sidebar = $("#sidebar")
     #basediv = HTML.div()
     #main.append(basediv)
@@ -1032,7 +1034,7 @@ class CoffeeMain
     
     # should be divisible by 20 because of map tiles
     mapWidth = Math.floor(main.width() / 20) * 20
-    mapHeight = Math.floor(main.height() / 20) * 20
+    mapHeight = 800 # Math.floor(main.height() / 20) * 20
     await
       new Sprites(defer sprites)
     gameState = new GameState(sprites, mapWidth, mapHeight)
