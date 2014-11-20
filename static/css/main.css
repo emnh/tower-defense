@@ -18,3 +18,10 @@
 .money {
   font-size: 16pt;
 }
+
+.buyItem-cursor.circle {
+  border-radius: 50%;
+  border-radius: 50%;
+  background: blue;
+  opacity: 0.25;
+}
