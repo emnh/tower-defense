@@ -238,17 +238,32 @@ class HVAnimSprite
 
   constructor: (imgsrc, animationIndices, interval, callback) ->
     sprite = @
-    texture = new Image()
-    texture.onload = () ->
-      canvases = ImageSprite.getParts(texture)
-      c2 = []
-      for i in animationIndices
-        c2.push(canvases[i])
-      sprite.canvases = c2
-      sprite.anim = new AnimatedSprite(sprite.canvases)
-      sprite.anim.animate(interval)
-      callback(sprite)
-    texture.src = imgsrc
+    if callback
+      texture = new Image()
+      texture.onload = () ->
+        canvases = ImageSprite.getParts(texture)
+        c2 = []
+        for i in animationIndices
+          c2.push(canvases[i])
+        sprite.canvases = c2
+        sprite.anim = new AnimatedSprite(sprite.canvases)
+        sprite.anim.animate(interval)
+        sprite.container = sprite.anim.container
+        callback(sprite)
+      texture.src = imgsrc
+    @imgsrc = imgsrc
+    @interval = interval
+    @animationIndices = animationIndices
+
+  clone: () ->
+    n = new HVAnimSprite(@imgsrc, @animationIndices, @interval)
+    n.canvases = []
+    for c in @canvases
+      n.canvases.push(ImageSprite.cloneCanvas(c))
+    n.anim = new AnimatedSprite(n.canvases)
+    n.anim.animate(@interval)
+    n.container = n.anim.container
+    n
     
 class Explosion extends HVAnimSprite
 
@@ -266,7 +281,7 @@ class  extends HVAnimSprite
     @interval = 150
     super(@imgsrc, @animationIndices, @interval, callback)
 
-class Creation2A extends HVAnimSprite
+class Creation2AAnim extends HVAnimSprite
 
   constructor: (callback) ->
     @imgsrc = 'data/images/Buildings/Creatn2a.bmp'
@@ -274,7 +289,7 @@ class Creation2A extends HVAnimSprite
     @interval = 150
     super(@imgsrc, @animationIndices, @interval, callback)
 
-class Factory2 extends HVAnimSprite
+class Factory2Anim extends HVAnimSprite
 
   constructor: (callback) ->
     @imgsrc = 'data/images/Buildings/Factory2.bmp'
@@ -526,7 +541,7 @@ class BuyMenu
     bar = @container
     await
       new Factory2Sprite(defer factorySprite)
-      new Factory2Sprite(defer mapFactorySprite)
+      new Factory2Anim(defer mapFactorySprite)
       new Artillery2Sprite(defer artillerySprite)
       new Artillery2Sprite(defer mapArtillerySprite)
 
@@ -955,11 +970,12 @@ class CoffeeMain
     todo = HTML.ul()
     main.append(todo)
     todoItems = [
-      'add base animation for towers',
       'add tower fire animation',
-      'add circle for range when placing tower',
       'animate money rising up from dead creep',
+      'toggle range display overlay for towers',
       'create map editor',
+      'click tower to see properties and statistics',
+      'DPS overlay',
     ]
     for item in todoItems
       todo.append(HTML.li(item))
