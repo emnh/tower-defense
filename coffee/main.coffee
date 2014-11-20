@@ -880,7 +880,7 @@ class Creep
 
 class Tower
 
-  constructor: ([x, y, width, height], startRotation, sprite, fireRate, damage, range) ->
+  constructor: (gameState, [x, y, width, height], startRotation, sprite, fireRate, damage, range) ->
     @container = HTML.div()
     @container.append(sprite.container)
     @container
@@ -896,7 +896,7 @@ class Tower
     @fireRate = fireRate
     @damage = damage
     @range = range
-    @lastFire = Misc.getTime()
+    @lastFire = gameState.getGameTime()
     @startRotation = startRotation
     @currentRotation = 0
 
@@ -1164,11 +1164,18 @@ class GameState
     @bullets = []
     @lives = 30
     @money = 1000
+    @paused = false
+    @pausedTime = 0
+    @startTime = Misc.getTime()
 
   start: () ->
-    @waveStart = Misc.getTime() + 1*1000
+    @waveStart = @getGameTime() + 1*1000
     gameState = @
     setInterval (() -> gameState.updateGameTimer()), 1000
+
+  getGameTime: () ->
+    currentTime = Misc.getTime()
+    currentTime - @pausedTime - @startTime
 
   waveFinished: () ->
     @wave == @nextWave and @waveReady and @creeps.length == 0
@@ -1188,7 +1195,7 @@ class GameState
     path = [[0, @mapHeight / 2], [@mapWidth, @mapHeight / 2]]
     wave
     sprite = wave.sprite
-    currentTime = Misc.getTime()
+    currentTime = @getGameTime()
     for i in [1..wave.count]
       creep = new Creep(@, sprite.clone(), wave.speed, wave.health, path, wave.prize)
       creep.id = i
@@ -1198,15 +1205,12 @@ class GameState
     @oldFrameTime = currentTime
     @waveReady = true
 
-  frameCreeps: () ->
-    currentTime = Misc.getTime()
-    oldFrameTime = @oldFrameTime
-    elapsed = currentTime - oldFrameTime
+  frameCreeps: (elapsed) ->
     mapContainer = @mapContainer
     aliveCreeps = []
     for creep in @creeps
       if not creep.active
-        if creep.startTime <= currentTime
+        if creep.startTime <= @getGameTime()
           if creep.newCreep
             creep.newCreep = false
             creep.pos =
@@ -1230,17 +1234,16 @@ class GameState
       if not creep.dead
         aliveCreeps.push(creep)
     @creeps = aliveCreeps
-    @oldFrameTime = currentTime
 
   shoot: (tower, creep) ->
     hit = () ->
       creep.updateHealth(creep.health - tower.damage)
-    tower.lastFire = Misc.getTime()
+    tower.lastFire = @getGameTime()
     bullet = new Bullet(@sprites.bullet.clone())
     bullet.targetPos = creep.pos
     bullet.duration = 100
     setTimeout hit, bullet.duration
-    bullet.startTime = Misc.getTime()
+    bullet.startTime = @getGameTime()
     bullet.startPos =
       x: tower.pos.x
       y: tower.pos.y
@@ -1262,6 +1265,10 @@ class GameState
       tower.moving = false
 
   animate: () ->
+    if @paused
+      gameState = @
+      requestAnimationFrame(() -> gameState.animate())
+      return
     @mapContainer.find(".dead").remove()
     for tower in @towers
       if not tower.moving and tower.target? and not tower.target.dead?
@@ -1289,7 +1296,7 @@ class GameState
     requestAnimationFrame(() -> gameState.animate())
 
   frameBullets: () ->
-    currentTime = Misc.getTime()
+    currentTime = @getGameTime()
     activeBullets = []
     for bullet in @bullets
       elapsed = (currentTime - bullet.startTime) / bullet.duration
@@ -1309,7 +1316,7 @@ class GameState
     dist = Math.sqrt(dx * dx + dy * dy)
 
   frameTowers: () ->
-    currentTime = Misc.getTime()
+    currentTime = @getGameTime()
     for tower in @towers
       aliveCreeps = []
       for creep in @creeps
@@ -1325,27 +1332,39 @@ class GameState
           aliveCreeps.push(creep)
       @creeps = aliveCreeps
 
+  pause: () ->
+    @pausedStart = Misc.getTime()
+    gameState.paused = true
+
+  unpause: () ->
+    @pausedTime += Misc.getTime() - @pausedStart
+    gameState.paused = false
 
   frame: () ->
+    if @paused
+      return
+    currentTime = @getGameTime()
+    oldFrameTime = @oldFrameTime
+    elapsed = currentTime - oldFrameTime
+    @oldFrameTime = currentTime
     if @waveFinished()
       @nextWave += 1
-      @waveStart = Misc.getTime() + 3 * 1000
+      @waveStart = @getGameTime() + 3 * 1000
       delete @waveStarted
     #if @wave == @nextWave and @waveReady and @creeps.length > 0
-    @frameBullets()
-    @frameCreeps()
-    @frameTowers()
+    @frameBullets(elapsed)
+    @frameCreeps(elapsed)
+    @frameTowers(elapsed)
 
   updateGameTimer: () ->
     gameState = @
-    d = new Date()
-    cur = d.getTime()
-    seconds = Math.round((gameState.waveStart - cur) / 1000)
+    currentTime = gameState.getGameTime()
+    seconds = Math.round((gameState.waveStart - currentTime) / 1000)
     if seconds >= 0
       $("#gametimer").html("Next wave in " + seconds + " seconds")
     else
       if gameState.waveStarted?
-        d = new Date(cur - gameState.waveStarted)
+        d = new Date(currentTime - gameState.waveStarted)
         $("#gametimer").html("Wave timer: #{d.getMinutes()}:#{d.getSeconds()}")
       else
         gameState.startWave()
@@ -1363,7 +1382,7 @@ class GameState
       sprite = buyItem.createInstance()
       [width, height] = [buyActive.cursorImage.width(), buyActive.cursorImage.height()]
       buyItem = buyActive.buyItem
-      tower = new Tower([x, y, width, height], buyItem.startRotation, sprite, buyItem.fireRate, buyItem.damage, buyItem.range)
+      tower = new Tower(gameState, [x, y, width, height], buyItem.startRotation, sprite, buyItem.fireRate, buyItem.damage, buyItem.range)
       @mapContainer.append(tower.container)
       gameState.towers.push(tower)
     else
@@ -1435,8 +1454,16 @@ class CoffeeMain
     buyMenu.setupMouseHandlers mapContainer, gameState
 
     $("#startNext").click () ->
-      gameState.waveStart = Misc.getTime()
+      gameState.waveStart = gameState.getGameTime()
       gameState.startWave()
+
+    $("#pause").click () ->
+      if gameState.paused
+        gameState.unpause()
+        Misc.displayMessage "Game started!"
+      else
+        gameState.pause()
+        Misc.displayMessage "Game paused!"
 
     setInterval (() -> gameState.frame()), 10
     requestAnimationFrame(() -> gameState.animate())
