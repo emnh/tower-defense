@@ -728,9 +728,22 @@ class BuyGenerator extends BuyItem
     @damage = 50
     @fireRate = 100
     @range = 250
-    @startRotation = Math.PI / 4 #3 * Math.PI / 8
+    @startRotation = 0
     @mapSprite = sprites.mapGenerator
     super()
+
+class BuyField extends BuyItem
+
+  constructor: (sprites) ->
+    @sprite = sprites.field
+    @cost = 5000
+    @damage = 500
+    @fireRate = 100
+    @range = 500
+    @startRotation = Math.PI / 4 #3 * Math.PI / 8
+    @mapSprite = sprites.mapField
+    super()
+
 
 
 
@@ -791,30 +804,6 @@ class GrassSprite extends FixedSprite
     super(@imgsrc, index, callback)
 
 class DirectedSprite extends FixedSprite
-
-class Tank1Sprite extends FixedSprite
-
-  constructor: (callback) ->
-    @imgsrc = 'Vehicles/Tank1.bmp'
-    super(@imgsrc, 4, callback)
-
-class Tank2Sprite extends FixedSprite
-
-  constructor: (callback) ->
-    @imgsrc = 'Vehicles/Tank2.bmp'
-    super(@imgsrc, 4, callback)
-
-class Tank5Sprite extends FixedSprite
-
-  constructor: (callback) ->
-    @imgsrc = 'Vehicles/Tank5.bmp'
-    super(@imgsrc, 4, callback)
-
-class Tank14Sprite extends FixedSprite
-
-  constructor: (callback) ->
-    @imgsrc = 'Vehicles/Tank14.bmp'
-    super(@imgsrc, 4, callback)
 
 class MotherSprite extends FixedSprite
 
@@ -955,6 +944,7 @@ class BuyMenu
     buyActives.push(@createActive(new BuyFactory2(sprites)))
     buyActives.push(@createActive(new BuyArtillery2(sprites)))
     buyActives.push(@createActive(new BuyGenerator(sprites)))
+    buyActives.push(@createActive(new BuyField(sprites)))
 
     for buyActive in buyActives
       buyItem = buyActive.buyItem
@@ -1070,47 +1060,66 @@ class Map
 class Wave
 
 class Wave1 extends Wave
-  constructor: () ->
+  constructor: (sprites) ->
     @count = 5
     @speed = 10.0 / 100
     @interval = 1500
     @health = 200
     @prize = 20
-    @spriteClass = Tank1Sprite
-    #@spriteClass = MotherSprite
+    @sprite = sprites.beast
 
 class Wave2 extends Wave
-  constructor: () ->
+  constructor: (sprites) ->
     @count = 15
     # pixels per millisecond
     @speed = 5.0 / 100
     @interval = 2000
     @health = 500
     @prize = 50
-    @spriteClass = Tank5Sprite
+    @sprite = sprites.tank5
 
 class Wave3 extends Wave
-  constructor: () ->
+  constructor: (sprites) ->
     @count = 100
     @speed = 7.0 / 100
     @interval = 250
     @health = 100
     @prize = 20
-    @spriteClass = Tank14Sprite
+    @sprite = sprites.tank14
 
 class Wave4 extends Wave
-  constructor: () ->
-    @count = 1
-    @speed = 1.0 / 100
-    @interval = 5000
+  constructor: (sprites) ->
+    @count = 2
+    @speed = 2.0 / 100
+    @interval = 10000
     @health = 5000
     @prize = 500
-    @spriteClass = MotherSprite
+    @sprite = sprites.mother
+
+class Wave5 extends Wave
+  constructor: (sprites) ->
+    @count = 20
+    @speed = 5.0 / 100
+    @interval = 1000
+    @health = 1000
+    @prize = 100
+    @sprite = sprites.tank1
+
+class Wave6 extends Wave
+  constructor: (sprites) ->
+    @count = 20
+    @speed = 10.0 / 100
+    @interval = 1000
+    @health = 1500
+    @prize = 150
+    @sprite = sprites.tankB1
+
 
 class Sprites
 
   constructor: (callback) ->
     await
+      new MotherSprite(defer @mother)
       new BulletSprite(defer @bullet)
       new Explosion(defer @smallExplosion)
       new BigExplosion(defer @bigExplosion)
@@ -1120,6 +1129,9 @@ class Sprites
       new Artillery2Sprite(defer @mapArtillery)
       new FixedSprite('Buildings/Generator.bmp', 0, defer @generator)
       new HVAnimSprite('Buildings/Generator.bmp', [0..14], Misc.BUILDING_ANIM_INTERVAL, defer @mapGenerator)
+      new FixedSprite('Buildings/Field.bmp', 2, defer @field)
+      # TODO: sprite alignment for animation is incorrect
+      new HVAnimSprite('Buildings/Field.bmp', [3,4,0,1,2,1,0,4,3], Misc.BUILDING_ANIM_INTERVAL, defer @mapField)
       new GrassSprite(0, defer @grassTopLeft)
       new GrassSprite(1, defer @grassTopMid)
       new GrassSprite(2, defer @grassTopRight)
@@ -1129,6 +1141,13 @@ class Sprites
       new GrassSprite(6, defer @grassBottomLeft)
       new GrassSprite(7, defer @grassBottomMid)
       new GrassSprite(8, defer @grassBottomRight)
+      new FixedSprite('Vehicles/Beast.bmp', 6, defer @beast)
+      new FixedSprite('Vehicles/Tank1.bmp', 4, defer @tank1)
+      new FixedSprite('Vehicles/TankB1.bmp', 4, defer @tankB1)
+      new FixedSprite('Vehicles/Tank2.bmp', 4, defer @tank2)
+      new FixedSprite('Vehicles/Tank5.bmp', 4, defer @tank5)
+      new FixedSprite('Vehicles/Tank14.bmp', 4, defer @tank14)
+      new FixedSprite('Vehicles/Tank14.bmp', 4, defer @tank14)
     callback(@)
 
 class GameState
@@ -1161,26 +1180,17 @@ class GameState
       @waveStarted = @waveStart
       delete @waveStart
       Misc.displayMessage("Wave starting!")
-      if @wave == 1
-        wave = new Wave1()
-        @startWaveP(wave)
-      else if @wave == 2
-        wave = new Wave2()
-        @startWaveP(wave)
-      else if @wave == 3
-        wave = new Wave3()
-        @startWaveP(wave)
-      else if @wave == 4
-        wave = new Wave4()
-        @startWaveP(wave)
+      waveClass = eval('Wave' + @wave)
+      wave = new waveClass(@sprites)
+      @startWaveP(wave)
 
   startWaveP: (wave) ->
     path = [[0, @mapHeight / 2], [@mapWidth, @mapHeight / 2]]
-    await
-      new wave.spriteClass(defer tank)
+    wave
+    sprite = wave.sprite
     currentTime = Misc.getTime()
-    for i in [0..wave.count]
-      creep = new Creep(@, tank.clone(), wave.speed, wave.health, path, wave.prize)
+    for i in [1..wave.count]
+      creep = new Creep(@, sprite.clone(), wave.speed, wave.health, path, wave.prize)
       creep.id = i
       creep.startTime = currentTime + i * wave.interval
       creep.newCreep = true
@@ -1293,17 +1303,19 @@ class GameState
         bullet.container.addClass("dead")
     @bullets = activeBullets
 
+  dist: (tower, creep) ->
+    dx = tower.midX() - creep.midX()
+    dy = tower.midY() - creep.midY()
+    dist = Math.sqrt(dx * dx + dy * dy)
+
   frameTowers: () ->
     currentTime = Misc.getTime()
     for tower in @towers
       aliveCreeps = []
       for creep in @creeps
         if creep.active
-          dx = tower.midX() - creep.midX()
-          dy = tower.midY() - creep.midY()
-          dist = Math.sqrt(dx * dx + dy * dy)
-          if dist < tower.range
-            if not tower.target? or tower.target.dead?
+          if @dist(tower, creep) <= tower.range
+            if not tower.target? or tower.target.dead? or @dist(tower, tower.target) > tower.range
               tower.target = creep
             if currentTime - tower.lastFire > tower.fireRate
               @shoot(tower, tower.target)
