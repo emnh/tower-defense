@@ -25,3 +25,7 @@
   background: blue;
   opacity: 0.25;
 }
+
+.dead {
+  visibility: hidden;
+}

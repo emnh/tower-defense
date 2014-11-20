@@ -264,12 +264,26 @@ class HVAnimSprite
     n.anim.animate(@interval)
     n.container = n.anim.container
     n
+
+  scale: (width, height) ->
+    for c in @canvases
+      $(c).css
+        width: width
+        height: height
     
 class Explosion extends HVAnimSprite
 
   constructor: (callback) ->
     @imgsrc = 'data/images/Misc/expSmall.bmp'
     @animationIndices = [0..6]
+    @interval = 150
+    super(@imgsrc, @animationIndices, @interval, callback)
+
+class BigExplosion extends HVAnimSprite
+
+  constructor: (callback) ->
+    @imgsrc = 'data/images/Misc/exploBig.bmp'
+    @animationIndices = [0..13]
     @interval = 150
     super(@imgsrc, @animationIndices, @interval, callback)
 
@@ -293,8 +307,8 @@ class Factory2Anim extends HVAnimSprite
 
   constructor: (callback) ->
     @imgsrc = 'data/images/Buildings/Factory2.bmp'
-    @animationIndices = [0,1,2,3,4,5,7,8,9,10]
-    @interval = 150
+    @animationIndices = [0,1,2,3,4,5,7,8,9,10,9,8,7,5,4,3,2,1]
+    @interval = 50
     super(@imgsrc, @animationIndices, @interval, callback)
 
 class FixedSpriteDebug
@@ -318,13 +332,19 @@ class FixedSprite
         canvases = ImageSprite.getParts(texture)
         if not canvases[index]?
           throw "incorrect sprite index #{index} for #{imgsrc}"
+        terrainSprite.canvases = canvases
         terrainSprite.canvas = canvases[index]
         terrainSprite.container.append(terrainSprite.canvas)
         callback(terrainSprite)
       texture.src = imgsrc
 
+  setIndex: (index) ->
+    @container.empty()
+    @container.append(@canvases[index])
+
   clone: () ->
     fs = new FixedSprite(@imgsrc, @index)
+    fs.canvases = (ImageSprite.cloneCanvas(x) for x in @canvases)
     fs.canvas = ImageSprite.cloneCanvas(@canvas)
     fs.container.append(fs.canvas)
     fs
@@ -367,15 +387,53 @@ class BuyArtillery2 extends BuyItem
     @damage = 50
     @fireRate = 500
     @range = 250
-    @startRotation = 3 * Math.PI / 8
+    @startRotation = Math.PI / 4 #3 * Math.PI / 8
     @mapSprite = mapSprite
     super()
+
+class Direction
+  constructor: (spriteIndex, radians) ->
+    @spriteIndex = spriteIndex
+    @radians = radians
+
+class DirectionIndices
+  @m = Math.PI / 8
+  @directions =
+    TopLeft: new Direction(0, 3*@m)
+    TopMid: new Direction(1, 2*@m)
+    TopRight: new Direction(2, 1*@m)
+    MidLeft: new Direction(3, 4*@m)
+    MidRight: new Direction(4, 0*@m)
+    BottomLeft: new Direction(5, 5*@m)
+    BottomMid: new Direction(6, 6*@m)
+    BottomRight: new Direction(7, 7*@m)
+
+  @rad2index: (rad) ->
+    while rad < 0
+      rad += 2 * Math.PI
+    while rad > 2 * Math.PI
+      rad -= 2 * Math.PI
+    mindist = Number.MAX_VALUE
+    mindir = undefined
+    for name, dir of @directions
+      dist = Math.abs(rad - dir.radians)
+      if dist < mindist
+        mindist = dist
+        mindir = dir.spriteIndex
+    mindir
+
+class BulletSprite extends FixedSprite
+
+  constructor: (callback) ->
+    @imgsrc = 'data/images/Misc/Bullets.bmp'
+    @rotation = 3 * Math.pi / 8
+    super(@imgsrc, 1, callback)
 
 class Artillery2Sprite extends FixedSprite
  
   constructor: (callback) ->
     @imgsrc = 'data/images/Buildings/Artilery2.bmp'
-    super(@imgsrc, 1, callback)
+    super(@imgsrc, 0, callback)
 
 class Factory2Sprite extends FixedSprite
  
@@ -445,6 +503,10 @@ class MotherSprite extends FixedSprite
     @imgsrc = 'data/images/Vehicles/Mother.bmp'
     super(@imgsrc, 0, callback)
 
+class Bullet
+  constructor: (sprite) ->
+    @container = HTML.div()
+    @container.append(sprite.container)
 
 class Creep
 
@@ -481,15 +543,23 @@ class Creep
 
   remove: () ->
     @container.empty()
-    @container.append(@gameState.smallExplosion.anim.clone().container)
+    sprite =
+      if @sprite.canvas.width > 20
+        @gameState.sprites.bigExplosion
+      else
+        @gameState.sprites.smallExplosion
+    newSprite = sprite.clone()
+    newSprite.scale @sprite.canvas.width, @sprite.canvas.height
+    @container.append(newSprite.container)
     container = @container
-    setTimeout (() -> container.remove()), @gameState.smallExplosion.anim.loopTime
+    setTimeout (() -> container.remove()), newSprite.anim.loopTime
     @active = false
     @dead = true
 
   updateHealth: (health) ->
+    oldHealth = @health
     @health = health
-    if @health <= 0
+    if health <= 0 and oldHealth > 0
       @gameState.winPrize(@prize)
       @remove()
     else if @health <= 0.2 * @maxHealth
@@ -535,17 +605,8 @@ class BuyActive
     $(cursorImage).addClass("buyItem-cursorImage")
 
 class BuyMenu
-  constructor: (callback) ->
-    buyMenu = @
-    @container = HTML.div()
-    bar = @container
-    await
-      new Factory2Sprite(defer factorySprite)
-      new Factory2Anim(defer mapFactorySprite)
-      new Artillery2Sprite(defer artillerySprite)
-      new Artillery2Sprite(defer mapArtillerySprite)
 
-    createActive = (buyItem, sprite) ->
+  createActive: (buyItem, sprite) ->
       cursor = HTML.div().addClass("circle").addClass("buyItem-cursor")
       cursor
         .css
@@ -561,25 +622,28 @@ class BuyMenu
           top: buyItem.range / 2 - sprite.canvas.height / 2
 
       buyActive = new BuyActive(buyItem, cursor)
-    
-    sprite = factorySprite
-    buyItem = new BuyFactory2(sprite, mapFactorySprite)
-    buyActive = createActive(buyItem, sprite)
+
+  constructor: (gameState, callback) ->
+    buyMenu = @
+    @container = HTML.div()
+    bar = @container
+
+    sprites = gameState.sprites
+   
+    buyItem = new BuyFactory2(sprites.factorySprite, sprites.mapFactorySprite)
+    buyActive = @createActive(buyItem, sprites.factorySprite)
     bar.append(buyItem.container)
     buyItem.container.click do (buyActive) -> () -> buyMenu.setActive buyActive
 
     buyMenu.setActive(buyActive)
 
-    sprite = artillerySprite
-    buyItem = new BuyArtillery2(artillerySprite, mapArtillerySprite)
-    buyActive = createActive(buyItem, sprite)
+    buyItem = new BuyArtillery2(sprites.artillerySprite, sprites.mapArtillerySprite)
+    buyActive = @createActive(buyItem, sprites.artillerySprite)
     bar.append(buyItem.container)
     buyItem.container.click do (buyActive) -> () -> buyMenu.setActive buyActive
 
     @moneyContainer = HTML.div().addClass("money")
     bar.append(@moneyContainer)
-
-    callback(buyMenu)
   
   setActive: (buyActive) ->
     @active = buyActive
@@ -628,52 +692,44 @@ class BuyMenu
 
 class Map
   
-  constructor: (mapWidth, mapHeight, callback) ->
+  constructor: (gameState, mapWidth, mapHeight) ->
     terrain = []
     @terrain = terrain
 
-    await
-      new GrassTopLeft(defer grassTopLeft)
-      new GrassTop(defer grassTop)
-      new GrassTopRight(defer grassTopRight)
-      new GrassMid(defer grassMid)
-  
-    canvas = grassTopLeft.canvas
-    $(canvas)
+    sprites = gameState.sprites
+
+    sprite = sprites.grassTopLeft.clone()
+    $(sprite.container)
       .css('position', 'absolute')
       .css('left', 0)
       .css('top', 0)
-    terrain.push(canvas)
+    terrain.push(sprite.container)
 
-    canvas = grassTopRight.canvas
-    $(canvas)
+    sprite = sprites.grassTopRight.clone()
+    $(sprite.container)
       .css('position', 'absolute')
-      .css('left', mapWidth - canvas.width)
+      .css('left', mapWidth - sprite.canvas.width)
       .css('top', 0)
-    terrain.push(canvas)
+    terrain.push(sprite.container)
 
-    canvas = grassTop.canvas
-    for x in [1..(mapWidth / canvas.width) - 2]
-      clone = ImageSprite.cloneCanvas(canvas)
-      terrain.push(clone)
-      $(clone)
+    sprite = sprites.grassTop
+    for x in [1..(mapWidth / sprite.canvas.width) - 2]
+      clone = sprite.clone()
+      terrain.push(clone.container)
+      $(clone.container)
         .css('position', 'absolute')
-        .css('left', x * canvas.width)
+        .css('left', x * sprite.canvas.width)
         .css('top', 0)
-    $(canvas).remove()
 
-    canvas = grassMid.canvas
-    for x in [0..(mapWidth / canvas.width)-1]
-      for y in [1..(mapHeight / canvas.height)-1]
-        clone = ImageSprite.cloneCanvas(canvas)
-        terrain.push(clone)
-        $(clone)
+    sprite = sprites.grassMid.clone()
+    for x in [0..(mapWidth / sprite.canvas.width)-1]
+      for y in [1..(mapHeight / sprite.canvas.height)-1]
+        clone = sprite.clone()
+        terrain.push(clone.container)
+        $(clone.container)
           .css('position', 'absolute')
-          .css('left', x * canvas.width)
-          .css('top', y * canvas.height)
-    $(canvas).remove()
-
-    callback(@)
+          .css('left', x * sprite.canvas.width)
+          .css('top', y * sprite.canvas.height)
 
 class Wave
 
@@ -685,6 +741,7 @@ class Wave1 extends Wave
     @health = 200
     @prize = 20
     @spriteClass = Tank1Sprite
+    #@spriteClass = MotherSprite
 
 class Wave2 extends Wave
   constructor: () ->
@@ -714,15 +771,35 @@ class Wave4 extends Wave
     @prize = 500
     @spriteClass = MotherSprite
 
+class Sprites
+
+  constructor: (callback) ->
+    await
+      new BulletSprite(defer @bullet)
+      new Explosion(defer @smallExplosion)
+      new BigExplosion(defer @bigExplosion)
+      new Factory2Sprite(defer @factorySprite)
+      new Factory2Anim(defer @mapFactorySprite)
+      new Artillery2Sprite(defer @artillerySprite)
+      new Artillery2Sprite(defer @mapArtillerySprite)
+      new GrassTopLeft(defer @grassTopLeft)
+      new GrassTop(defer @grassTop)
+      new GrassTopRight(defer @grassTopRight)
+      new GrassMid(defer @grassMid)
+    callback(@)
 
 class GameState
-  constructor: () ->
+  constructor: (sprites, mapWidth, mapHeight) ->
+    @sprites = sprites
+    @mapWidth = mapWidth
+    @mapHeight = mapHeight
     @wave = 0
     @nextWave = 1
     @waveReady = true
     @map = null
     @creeps = []
     @towers = []
+    @bullets = []
     @lives = 30
     @money = 1000
 
@@ -797,19 +874,27 @@ class GameState
         if creep.pos.x > @mapWidth or creep.pos.y > @mapHeight
           @loseLife(1)
           creep.remove()
-        mapContainer.append(creep.container)
-        $(creep.container)
-          .css "position", "absolute"
-          .css "left", creep.pos.x
-          .css "top", creep.pos.y
       if not creep.dead
         aliveCreeps.push(creep)
     @creeps = aliveCreeps
     @oldFrameTime = currentTime
 
-  fireShot: (tower, creep) ->
-    creep.updateHealth(creep.health - tower.damage)
+  shoot: (tower, creep) ->
+    hit = () ->
+      creep.updateHealth(creep.health - tower.damage)
     tower.lastFire = Misc.getTime()
+    bullet = new Bullet(@sprites.bullet.clone())
+    bullet.targetPos = creep.pos
+    bullet.duration = 100
+    setTimeout hit, bullet.duration
+    bullet.startTime = Misc.getTime()
+    bullet.startPos =
+      x: tower.pos.x
+      y: tower.pos.y
+    bullet.pos =
+      x: bullet.startPos.x
+      y: bullet.startPos.y
+    @bullets.push(bullet)
 
   rotateTower: (tower, creep) ->
     dx = tower.midX() - creep.midX()
@@ -818,14 +903,52 @@ class GameState
     tower.moving = true
     tower.container.animateRotate tower.currentRotation, rad, 100, "swing", () ->
       tower.currentRotation = rad
+      #if tower.sprite.setIndex?
+      #  index = DirectionIndices.rad2index(rad)
+      #  tower.sprite.setIndex(index)
       tower.moving = false
 
   animate: () ->
+    @mapContainer.find(".dead").remove()
     for tower in @towers
       if not tower.moving and tower.target? and not tower.target.dead?
         @rotateTower(tower, tower.target)
+    for creep in @creeps
+      if creep.active and not creep.dead?
+        if not creep.addedToMap?
+          @mapContainer.append(creep.container)
+          creep.addedToMap = true
+        creep.container
+          .css
+            position: "absolute"
+            left: creep.pos.x
+            top: creep.pos.y
+    for bullet in @bullets
+      if not bullet.addedToMap?
+        @mapContainer.append(bullet.container)
+        bullet.addedToMap = true
+      bullet.container
+        .css
+          position: "absolute"
+          left: bullet.pos.x
+          top: bullet.pos.y
     gameState = @
     requestAnimationFrame(() -> gameState.animate())
+
+  frameBullets: () ->
+    currentTime = Misc.getTime()
+    activeBullets = []
+    for bullet in @bullets
+      elapsed = (currentTime - bullet.startTime) / bullet.duration
+      if elapsed <= 1.0
+        ndx = bullet.targetPos.x - bullet.startPos.x
+        ndy = bullet.targetPos.y - bullet.startPos.y
+        bullet.pos.x = bullet.startPos.x + ndx * elapsed
+        bullet.pos.y = bullet.startPos.y + ndy * elapsed
+        activeBullets.push(bullet)
+      else
+        bullet.container.addClass("dead")
+    @bullets = activeBullets
 
   frameTowers: () ->
     currentTime = Misc.getTime()
@@ -840,7 +963,7 @@ class GameState
             if not tower.target? or tower.target.dead?
               tower.target = creep
             if currentTime - tower.lastFire > tower.fireRate
-              @fireShot(tower, tower.target)
+              @shoot(tower, tower.target)
           if creep.health > 0
             aliveCreeps.push(creep)
         else
@@ -853,9 +976,10 @@ class GameState
       @nextWave += 1
       @waveStart = Misc.getTime() + 3 * 1000
       delete @waveStarted
-    if @wave == @nextWave and @waveReady and @creeps.length > 0
-      @frameCreeps()
-      @frameTowers()
+    #if @wave == @nextWave and @waveReady and @creeps.length > 0
+    @frameBullets()
+    @frameCreeps()
+    @frameTowers()
 
   updateGameTimer: () ->
     gameState = @
@@ -904,16 +1028,15 @@ class CoffeeMain
     #main.append(basediv)
     #crtdiv = HTML.div()
     #main.append(crtdiv)
-    #buy = new BuyMenu()
     Misc.addRotateAnimateToJQuery()
     
     # should be divisible by 20 because of map tiles
     mapWidth = Math.floor(main.width() / 20) * 20
     mapHeight = Math.floor(main.height() / 20) * 20
-    gameState = new GameState()
+    await
+      new Sprites(defer sprites)
+    gameState = new GameState(sprites, mapWidth, mapHeight)
     window.gameState = gameState # for debugging with js console
-    gameState.mapWidth = mapWidth
-    gameState.mapHeight = mapHeight
     gameState.start()
 
     mapContainer = HTML.div()
@@ -930,13 +1053,10 @@ class CoffeeMain
     #base = new Base(basediv)
     #crt = new Factory2(crtdiv)
     
-    await
-      new Explosion(defer explosion)
-      new Map(mapWidth, mapHeight, defer map)
-      new BuyMenu(defer buyMenu)
+    map = new Map(gameState, mapWidth, mapHeight)
+    buyMenu = new BuyMenu(gameState)
 
     gameState.mapContainer = mapContainer
-    gameState.smallExplosion = explosion
     gameState.winPrize = (prize) ->
       # TODO: animate money rising up from corpse
       gameState.money += prize
@@ -970,12 +1090,17 @@ class CoffeeMain
     todo = HTML.ul()
     main.append(todo)
     todoItems = [
-      'add tower fire animation',
+      'let tower / creep distance computation be from the closest corner',
+      'fix click responsiveness in placing tower',
+      'rotate bullets',
+      'improve tower rotation. use sprites, relative rotation',
+      'rotate tower randomly when no creeps around',
       'animate money rising up from dead creep',
       'toggle range display overlay for towers',
       'create map editor',
       'click tower to see properties and statistics',
       'DPS overlay',
+      'disallow multiple towers in same location'
     ]
     for item in todoItems
       todo.append(HTML.li(item))
