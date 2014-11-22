@@ -37,3 +37,8 @@
 .selectSprite:hover {
   border: 3px solid red;
 }
+
+.grid-header {
+  border: 0px;
+  padding: 0px;
+}

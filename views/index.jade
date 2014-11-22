@@ -13,9 +13,26 @@ html(lang='en')
     link(href='jscache/bootstrap-theme.min.css', rel='stylesheet')
     link(href='jscache/bootstrap-dashboard.css', rel='stylesheet')
     // Bootstrap core JavaScript
-    // Placed at the end of the document so the pages load faster 
     script(src='jscache/jquery.min.js')
     script(src='jscache/bootstrap.min.js')
+
+    script(src='jscache/SlickGrid/lib/jquery-1.7.min.js')
+    link(href='jscache/SlickGrid/slick.grid.css', rel='stylesheet')
+    link(href='jscache/SlickGrid/css/smoothness/jquery-ui-1.8.16.custom.css', rel='stylesheet')
+    link(href='jscache/SlickGrid/slick-default-theme.css', rel='stylesheet')
+    link(href='jscache/SlickGrid/examples/examples.css', rel='stylesheet')
+    script(src='jscache/SlickGrid/lib/jquery-ui-1.8.16.custom.min.js')
+    script(src='jscache/SlickGrid/lib/jquery.event.drag-2.2.js')
+    script(src='jscache/SlickGrid/slick.core.js')
+    script(src='jscache/SlickGrid/slick.formatters.js')
+    script(src='jscache/SlickGrid/slick.grid.js')
+    script(src='jscache/SlickGrid/slick.editors.js')
+    script(src="jscache/SlickGrid/plugins/slick.autotooltips.js")
+    script(src="jscache/SlickGrid/plugins/slick.cellrangedecorator.js")
+    script(src="jscache/SlickGrid/plugins/slick.cellrangeselector.js")
+    script(src="jscache/SlickGrid/plugins/slick.cellcopymanager.js")
+    script(src="jscache/SlickGrid/plugins/slick.cellselectionmodel.js")
+
     // My stuff
     link(href='css/main.css', rel='stylesheet')
     script(src='html.js')
@@ -52,9 +69,7 @@ html(lang='en')
         .col-sm-3.col-md-2.sidebar
           ul.nav.nav-sidebar
             li.active
-              a(href='#game')
-                | Game
-                span.sr-only (current)
+              a(href='#game') Game
             li
               a(href='#todo') TODO
             li

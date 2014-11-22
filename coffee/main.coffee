@@ -1522,6 +1522,36 @@ class GameState
     @lives -= lives
     @updateLives()
 
+FormulaEditor = (args) ->
+  _self = this
+  _editor = new Slick.Editors.Text(args)
+  _selector = undefined
+  $.extend this, _editor
+
+  init = ->
+    # register a plugin to select a range and append it to the textbox
+    # since events are fired in reverse order (most recently added are executed first),
+    # this will override other plugins like moverows or selection model and will
+    # not require the grid to not be in the edit mode
+    _selector = new Slick.CellRangeSelector()
+    console.log("selector", _selector)
+    _selector.onCellRangeSelected.subscribe _self.handleCellRangeSelected
+    args.grid.registerPlugin _selector
+    return
+
+  @destroy = ->
+    _selector.onCellRangeSelected.unsubscribe _self.handleCellRangeSelected
+    args.grid.unregisterPlugin _selector
+    _editor.destroy()
+    return
+
+  @handleCellRangeSelected = (e, args) ->
+    _editor.setValue _editor.getValue() + args.grid.getColumns()[args.range.fromCell].name + args.range.fromRow + ":" + args.grid.getColumns()[args.range.toCell].name + args.range.toRow
+    return
+
+  init()
+  return
+
 
 class CoffeeMain
   constructor: () ->
@@ -1651,6 +1681,119 @@ class CoffeeMain
         context.drawImage content.image, component.minX, component.minY, width, height, 0, 0, width, height
         main.append(c)
 
+  newMapEditor: () ->
+    main = $("#maincontent")
+    main.empty()
+
+    mapGridDiv = HTML.div '',
+      id: "mapGrid"
+    mapGridDiv.css
+      top: "20px"
+      height: "800px"
+    main.append(mapGridDiv)
+
+    grid = undefined
+    columns = []
+
+    tileWidth = 20
+    tileHeight = tileWidth
+    mapWidthTiles = 100
+    mapHeightTiles = 100
+
+    spriteMap = {}
+    for line in mapData.split('\n')
+      if line.indexOf('=') >= 0
+        [char, sprite, index] = line.split('=')
+        spriteMap[char] =
+          path: sprite
+          sprite: @sprites[sprite]
+          index: index
+    renderTile = (cellNode, row, dataContext, colDef) ->
+      c = $(cellNode).text()
+      spritePath = spriteMap[c].path
+      sprite = spriteMap[c].sprite.getFixedSprite(spriteMap[c].index)
+      $(cellNode).append(sprite.container)
+      Misc.move sprite.container, [0, 0]
+      $(cellNode).css
+        width: sprite.canvas.width + "px"
+        height: sprite.canvas.height + "px"
+        padding: "0px"
+        margin: "0px"
+        border: "0px"
+      $(cellNode).parent().css
+        border: "0px"
+        margin: "0px"
+        padding: "0px"
+
+
+    for i in [0..mapWidthTiles]
+      columns.push
+        id: "" + i
+        name: "" + i
+        field: i
+        editor: FormulaEditor #Slick.Editors.Text
+        asyncPostRender: renderTile
+        width: tileWidth
+        minWidth: tileWidth
+
+    options =
+      rowHeight: 20
+      defaultColumnWidth: 20
+      enableCellNavigation: true
+      enableColumnReorder: false
+      editable: true
+      enableAsyncPostRender: true
+      asyncPostRenderDelay: 1
+      enableAddRow: true
+      enableCellNavigation: true
+      autoEdit: false
+
+    data = []
+    i = 0
+    while i < mapHeightTiles
+      row = {}
+      for j in [0..mapWidthTiles]
+        row[j] = 'e'
+      data[i] = row
+      i++
+    grid = new Slick.Grid(mapGridDiv, data, columns, options)
+    grid.setSelectionModel new Slick.CellSelectionModel()
+    grid.registerPlugin new Slick.AutoTooltips()
+
+    # set keyboard focus on the grid
+    grid.getCanvasNode().focus()
+    copyManager = new Slick.CellCopyManager()
+    grid.registerPlugin copyManager
+
+    copyManager.onPasteCells.subscribe (e, args) ->
+      throw "This implementation only supports single range copy and paste operations"  if args.from.length isnt 1 or args.to.length isnt 1
+      from = args.from[0]
+      to = args.to[0]
+      val = undefined
+      i = 0
+
+      while i <= from.toRow - from.fromRow
+        j = 0
+
+        while j <= from.toCell - from.fromCell
+          if i <= to.toRow - to.fromRow and j <= to.toCell - to.fromCell
+            val = data[from.fromRow + i][columns[from.fromCell + j].field]
+            data[to.fromRow + i][columns[to.fromCell + j].field] = val
+            grid.invalidateRow to.fromRow + i
+          j++
+        i++
+      grid.render()
+      return
+
+    grid.onAddNewRow.subscribe (e, args) ->
+      item = args.item
+      column = args.column
+      grid.invalidateRow data.length
+      data.push item
+      grid.updateRowCount()
+      grid.render()
+
+
   mapEditor: () ->
     main = $("#maincontent")
     main.empty()
@@ -1774,13 +1917,18 @@ class CoffeeMain
       "#game": () -> main.loadGame()
       "#todo": () -> main.todo()
       "#sprites": () -> main.showSprites()
-      "#mapEditor": () -> main.mapEditor()
+      "#mapEditor": () -> main.newMapEditor()
           
     await @loadSprites(defer())
     for url, view of urlViewMap
-      $('a[href*="' + url + '"]').click () ->
-        view()
-      if location.href.endsWith(url)
-        view()
+      do (url, view) ->
+        clickHandler = () ->
+          $(this).parent().parent().find("li").removeClass("active")
+          $(this).parent().addClass("active")
+          view()
+        menuItem = $('a[href*="' + url + '"]')
+        menuItem.click clickHandler
+        if location.href.endsWith(url)
+          menuItem.trigger "click"
 
 window.CoffeeMain = new CoffeeMain()
