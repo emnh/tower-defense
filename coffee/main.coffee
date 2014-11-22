@@ -280,11 +280,74 @@ spritePaths = '''./Buildings/Artilery2.bmp
 ./Vehicles/TnkTurt2.bmp
 ./Vehicles/Transprt.bmp'''
 
+spritePaths = '''./Terrain/Cave.bmp
+./Terrain/Crater.bmp
+./Terrain/GrasRoad.bmp
+./Terrain/Grass.bmp
+./Terrain/Grs2Watr.bmp
+./Terrain/GrssCrtr.bmp
+./Terrain/GrssMisc.bmp'''
+
+mapData = '''a=./Terrain/Grass.bmp=0
+b=./Terrain/Grass.bmp=1
+c=./Terrain/Grass.bmp=2
+d=./Terrain/Grass.bmp=3
+e=./Terrain/Grass.bmp=4
+f=./Terrain/Grass.bmp=5
+g=./Terrain/Grass.bmp=6
+h=./Terrain/Grass.bmp=7
+i=./Terrain/Grass.bmp=8
+j=./Terrain/GrasRoad.bmp=1
+k=./Terrain/GrasRoad.bmp=11
+l=./Terrain/GrasRoad.bmp=25
+m=./Terrain/GrasRoad.bmp=8
+n=./Terrain/GrasRoad.bmp=7
+o=./Terrain/GrasRoad.bmp=0
+p=./Terrain/GrasRoad.bmp=2
+q=./Terrain/GrasRoad.bmp=25
+r=./Terrain/GrasRoad.bmp=24
+s=./Terrain/GrasRoad.bmp=18
+t=./Terrain/GrasRoad.bmp=17
+abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc
+deeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeeojjjjjjjjjjjjjjjjjjpeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeentkkkkkkkkkkkkkkkksmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeenmeeeeeeeeeef
+jjjjjjjjjjjjjjjjjjjjjjjjjjjjjqrjjjjjjjjjjjjjjjjlmeeeeeeeeeef
+kkkkkkkkkkkkkkkkkkkkkkkkkkkkkstkkkkkkkkkkkkkkkkkteeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeeeeeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeeeeeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeeeeeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeeeeeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeeeeeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeeeeeeeeeeeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeenrjjjjjjjjjjjjjjjjjjeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeekkkkkkkkkkkkkkkkkksmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeef
+deeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeenmeeeeeeeeeef
+ghhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhnmhhhhhhhhhhi'''
 
 class Misc
   @CURRENCY = "$"
   @SPRITE_DIR = 'data/images/'
   @BUILDING_ANIM_INTERVAL = 100
+
+  @addons: () ->
+    String::endsWith = (suffix) ->
+      @indexOf(suffix, @length - suffix.length) isnt -1
 
   @move: (obj, [x, y]) ->
     obj.css
@@ -294,6 +357,12 @@ class Misc
 
   @snapToGrid: (x, y) ->
       sz = 40
+      x = Math.floor(x / sz) * sz
+      y = Math.floor(y / sz) * sz
+      [x, y]
+
+  @snapToTerrain: (x, y) ->
+      sz = 20
       x = Math.floor(x / sz) * sz
       y = Math.floor(y / sz) * sz
       [x, y]
@@ -487,6 +556,7 @@ class ImageSprite
           id += 1
 
     canvases = []
+    canvases.json_components = []
     for id of componentByID
       component = componentByID[id]
       minX = Number.MAX_VALUE
@@ -505,12 +575,18 @@ class ImageSprite
         component.maxY = maxY
         component.width = 1 + maxX - minX
         component.height = 1 + maxY - minY
+        canvases.json_components.push
+          minX: minX
+          minY: minY
+          maxX: maxX
+          maxY: maxY
         canvasRet = createCanvas(component.width, component.height)
         for pos in component.positions
           rgba = ImageSprite.getPixel(pixels, pos[0], pos[1])
           ImageSprite.setPixel(canvasRet.newPixels, pos[0] - minX, pos[1] - minY, rgba)
         canvasRet.canvasContext.putImageData(canvasRet.newPixels, 0, 0)
-        canvases.push(canvasRet.canvas)
+        canvas = canvasRet.canvas
+        canvases.push(canvas)
 
     canvases
 
@@ -626,26 +702,52 @@ class Factory2Anim extends HVAnimSprite
     @interval = 50
     super(@imgsrc, @animationIndices, @interval, callback)
 
-class FixedSpriteDebug
+class SelectSpriteAll
 
   constructor: (imgsrc, index, callback) ->
     @container = HTML.div()
     sprite = @
     imgsrc = Misc.SPRITE_DIR + imgsrc
+    @imgsrc = imgsrc
     texture = new Image()
     texture.onload = () ->
       canvases = ImageSprite.getParts(texture)
+      sprite.json =
+        components: canvases.json_components
+      sprite.handlers = []
+      sprite.links = []
       for c, i in canvases
         $(c).css
           width: c.width * 2
           height: c.height * 2
         link = HTML.a c,
-          href: imgsrc
+          href: "#" + imgsrc
           title: i
+        do (c, i) ->
+          sprite.handlers[i] = (ev) ->
+            $("#selectedSprite")
+              .empty()
+              .append(ImageSprite.cloneCanvas(c))
+              .data("sprite", sprite)
+              .data("index", i)
+          link.click sprite.handlers[i]
+        sprite.links.push(link)
         sprite.container.append(link)
       sprite.canvas = canvases[index]
+      sprite.canvases = canvases
       callback(sprite)
     texture.src = imgsrc
+
+  reattachHandlers: () ->
+    for h, i in @handlers
+      @links[i].click h
+
+  getFixedSprite: (index) ->
+    fs = new FixedSprite(@imgsrc, index)
+    fs.canvases = (ImageSprite.cloneCanvas(x) for x in @canvases)
+    fs.canvas = ImageSprite.cloneCanvas(@canvas)
+    fs.container.append(fs.canvases[index])
+    fs
 
 class FixedSprite
   
@@ -1114,6 +1216,21 @@ class Wave6 extends Wave
     @prize = 150
     @sprite = sprites.tankB1
 
+class Wave7 extends Wave
+
+  constructor: (sprites) ->
+    @count = 10
+    @speed = 10.0 / 100
+    @interval = 1000
+    @health = 5000
+    @prize = 250
+    @sprite = sprites.transport
+
+class Wave8 extends Wave
+
+  constructor: (sprites) ->
+    @final = true
+
 
 class Sprites
 
@@ -1148,6 +1265,7 @@ class Sprites
       new FixedSprite('Vehicles/Tank5.bmp', 4, defer @tank5)
       new FixedSprite('Vehicles/Tank14.bmp', 4, defer @tank14)
       new FixedSprite('Vehicles/Tank14.bmp', 4, defer @tank14)
+      new FixedSprite('Vehicles/Transprt.bmp', 4, defer @transport)
     callback(@)
 
 class GameState
@@ -1165,8 +1283,10 @@ class GameState
     @lives = 30
     @money = 1000
     @paused = false
+    @finished = false
     @pausedTime = 0
     @startTime = Misc.getTime()
+    @updateLives()
 
   start: () ->
     @waveStart = @getGameTime() + 1*1000
@@ -1184,7 +1304,7 @@ class GameState
     @wave == @nextWave and @waveReady and @creeps.length == 0
 
   startWave: () ->
-    if @wave < @nextWave
+    if @wave < @nextWave and not @finished
       @waveReady = false
       @wave = @nextWave
       @waveStarted = @waveStart
@@ -1192,7 +1312,10 @@ class GameState
       Misc.displayMessage("Wave starting!")
       waveClass = eval('Wave' + @wave)
       wave = new waveClass(@sprites)
-      @startWaveP(wave)
+      if wave.final
+        Misc.displayMessage "Game over! You won!"
+      else
+        @startWaveP(wave)
 
   startWaveP: (wave) ->
     path = [[0, @mapHeight / 2], [@mapWidth, @mapHeight / 2]]
@@ -1373,7 +1496,11 @@ class GameState
         gameState.startWave()
 
   updateLives: () ->
-    $("#lives").html("Lives left: #{@lives}")
+    if @lives < 0
+      Misc.displayError("Game over! You lost!")
+      @finished = true
+    else
+      $("#lives").html("Lives left: #{@lives}")
 
   buy: (buyMenu, [x, y]) ->
     gameState = @
@@ -1391,6 +1518,10 @@ class GameState
     else
       Misc.displayError("Not enough money!")
 
+  loseLife: (lives) ->
+    @lives -= lives
+    @updateLives()
+
 
 class CoffeeMain
   constructor: () ->
@@ -1403,10 +1534,6 @@ class CoffeeMain
     main.css
       height: "800px"
     sidebar = $("#sidebar")
-    #basediv = HTML.div()
-    #main.append(basediv)
-    #crtdiv = HTML.div()
-    #main.append(crtdiv)
     Misc.addRotateAnimateToJQuery()
     
     # should be divisible by 20 because of map tiles
@@ -1423,15 +1550,6 @@ class CoffeeMain
       .css('height', mapHeight)
     main.append(mapContainer)
 
-    mapCanvas = HTML.canvas('')
-    #mapContainer.append(mapCanvas)
-    mapCanvas
-      .css('width', mapWidth)
-      .css('height', mapHeight)
-
-    #base = new Base(basediv)
-    #crt = new Factory2(crtdiv)
-    
     map = new Map(gameState, mapWidth, mapHeight)
     buyMenu = new BuyMenu(gameState)
 
@@ -1440,10 +1558,6 @@ class CoffeeMain
       # TODO: animate money rising up from corpse
       gameState.money += prize
       buyMenu.updateMoney(gameState.money)
-    gameState.loseLife = (lives) ->
-      gameState.lives -= lives
-      gameState.updateLives()
-    gameState.updateLives()
    
     for canvas in map.terrain
       mapContainer.append(canvas)
@@ -1488,37 +1602,185 @@ class CoffeeMain
       'click tower to see properties and statistics',
       'DPS overlay',
       'disallow multiple towers in same location',
-      'implement game over after all lives lost',
       'add support for AOE damage, add some towers'
     ]
     for item in todoItems
       todo.append(HTML.li(item))
 
-  sprites: () ->
+  loadSprites: (callback) ->
+    main = $("#maincontent")
+    main.empty()
+    if not @sprites?
+      @sprites = {}
+      await
+        for sprite, i in spritePaths.split('\n')
+          console.log("loading", sprite)
+          new SelectSpriteAll(sprite, 0, (defer @sprites[sprite]))
+    json = {}
+    for i,sprite of @sprites
+      main.append(sprite.container)
+      sprite.reattachHandlers()
+      for c in sprite.canvases
+        $(c).addClass("selectSprite")
+      json[sprite.imgsrc] = sprite.json
+    data = JSON.stringify(json)
+    url = 'data:text/json;charset=utf8,' + encodeURIComponent(data)
+    callback()
+    #window.open(url, '_blank')
+    #window.focus()
+
+  loadSprites3: () ->
     main = $("#maincontent")
     main.empty()
     sprites = []
     await
-      for sprite, i in spritePaths.split('\n')
-        spritePath = Misc.SPRITE_DIR + sprite
-        console.log("loading", spritePath)
-        new FixedSpriteDebug(sprite, 0, (defer sprites[i]))
-    for sprite in sprites
-      main.append(sprite.container)
+      for sprite, components of spriteData
+        texture = new Image()
+        sprites[sprite] =
+          image: texture
+          components: components.components
+        texture.onload = (defer())
+        texture.src = sprite
+    for sprite,content of sprites
+      console.log(content.components)
+      for component,i in content.components
+        c = HTML.canvas()
+        context = c[0].getContext("2d")
+        console.log(component)
+        [width, height] = [component.maxX - component.minX, component.maxY - component.minY]
+        context.drawImage content.image, component.minX, component.minY, width, height, 0, 0, width, height
+        main.append(c)
+
+  mapEditor: () ->
+    main = $("#maincontent")
+    main.empty()
     
+    if @map?
+      map = @map
+    else
+      map = {}
+      map.div = HTML.div()
+      map.text = HTML.textarea()
+
+    map.div.css
+      width: '1200px'
+      height: '800px'
+
+    main.append(map.text)
+    main.append(map.div)
+
+    sprites = @sprites
+
+    render = (mapdiv, text) ->
+      tiles = {}
+      previous = $(mapdiv).find(".tile")
+      for prev in previous
+        prev = $(prev)
+        xy = prev.data "x,y"
+        tiles[xy] = prev
+
+      spriteMap = {}
+      y = 0
+      keepTiles = {}
+      for line in text.split('\n')
+        if line.indexOf('=') >= 0
+          [char, sprite, index] = line.split('=')
+          spriteMap[char] =
+            path: sprite
+            sprite: sprites[sprite]
+            index: index
+        else
+          x = 0
+          for c in line
+            if c == ' '
+              continue
+            xs = x * 20
+            ys = y * 20
+            prev = tiles[x + "," + y]
+            #console.log("prev", prev)
+            if prev? and prev.data("imgsrc") == spriteMap[c].path and prev.data("index") == spriteMap[c].index
+              keepTiles[x + "," + y] = true
+              #console.log("reusing tile")
+            else
+              $(prev).remove()
+              spritePath = spriteMap[c].path
+              sprite = spriteMap[c].sprite.getFixedSprite(spriteMap[c].index)
+              mapdiv.append(sprite.container)
+              Misc.move sprite.container, [xs, ys]
+              sprite.container.addClass("tile")
+              sprite.container.css
+                opacity: "50%"
+              sprite.container.data "x,y", x + "," + y
+              sprite.container.data "imgsrc", spriteMap[c].path
+              sprite.container.data "index", spriteMap[c].index
+            x += 1
+          y += 1
+      for prev in previous
+        tile = $(prev)
+        if not keepTiles[tile.data("x,y")]?
+          tile.remove()
+
+    map.text.css
+      # http://stackoverflow.com/questions/2032652/how-do-i-get-an-html-text-area-with-monospaced-text-using-css
+      "font-family": "Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace"
+      position: "absolute"
+      top: 0
+      left: 0
+      "z-index": 1
+      "background-color": "transparent"
+      width: map.div.width()
+      height: map.div.height()
+      "font-weight": "bold"
+    map.text.val(mapData)
+    map.text.on "input propertychange", () ->
+      console.log(map.text.val())
+      render(map.div, map.text.val())
+    render(map.div, map.text.val())
+
+    sprite = $("#selectedSprite").data("sprite")
+    index = $("#selectedSprite").data("index")
+    cursor = undefined
+    map.div.on "mousemove", (event) ->
+      if sprite?
+        map.div.css
+          cursor: "none"
+        if not cursor?
+          newSprite = sprite.getFixedSprite(index)
+          cursor = newSprite.container
+        cursor.css
+          opacity: "0.5"
+        map.div.append(cursor)
+        [x, y] = [event.pageX - map.div.offset().left, event.pageY - map.div.offset().top]
+        [x, y] = Misc.snapToTerrain(x, y)
+        Misc.move cursor, [x, y]
+
+    map.div.click (event) ->
+      console.log("adding it", sprite, index)
+      c = sprite.getFixedSprite(index)
+      map.div.append(c.container)
+      [x, y] = [event.pageX - map.div.offset().left, event.pageY - map.div.offset().top]
+      [x, y] = Misc.snapToTerrain(x, y)
+      Misc.move c.container, [x, y]
+        
+    buyMenu = $("#buyMenu")
+    buyMenu.empty()
 
   main: () ->
     console.log("main")
     main = @
+    Misc.addons()
+
+    urlViewMap =
+      "#game": () -> main.loadGame()
+      "#todo": () -> main.todo()
+      "#sprites": () -> main.showSprites()
+      "#mapEditor": () -> main.mapEditor()
           
-    $('a[href*="#buy"]').click () ->
-      main.loadGame()
-    $('a[href*="#todo"]').click () ->
-      main.todo()
-    $('a[href*="#sprites"]').click () ->
-      main.sprites()
-    $('a[href*="#mapEditor"]').click () ->
-      main.sprites()
-    @loadGame()
+    await @loadSprites(defer())
+    for url, view of urlViewMap
+      $('a[href*="' + url + '"]').click () ->
+        view()
+      if location.href.endsWith(url)
+        view()
 
 window.CoffeeMain = new CoffeeMain()

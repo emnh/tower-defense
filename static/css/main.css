@@ -33,3 +33,7 @@
 .dead {
   visibility: hidden;
 }
+
+.selectSprite:hover {
+  border: 3px solid red;
+}
