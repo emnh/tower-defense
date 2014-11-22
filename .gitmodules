@@ -4,3 +4,6 @@
 [submodule "coffee-lib"]
 	path = coffee-lib
 	url = https://github.com/emnh/coffee-lib
+[submodule "static/jscache/SlickGrid"]
+	path = static/jscache/SlickGrid
+	url = https://github.com/mleibman/SlickGrid
